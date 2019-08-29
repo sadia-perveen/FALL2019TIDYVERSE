@@ -13,6 +13,10 @@ You have two tasks:
 ## Collaboration
 You should [fork](https://github.community/t5/Support-Protips/The-difference-between-forking-and-cloning-a-repository/ba-p/1372) the provided repository and then clone it locally if you wish. Once you have code to submit, you should make a pull request on the shared repository. Minimally, you should submit `.Rmd` files. Ideally, you should also submit an `.md` file and update the README.md file with your example.
 
+### Advice
+If you are going to use RStudio as your version control software, make sure to add `*.Rproj` and `.gitignore` to your .gitignore file **before** you make any commits. Otherwise you run the risk of trying to push that to the master repository in a pull request.
+
+## Notification
 ***After you’ve completed both parts of the assignment, please submit your GitHub handle name in the submission link provided in the week 1 folder!*** This will let your instructor know that your work is ready to be graded.
 
 ## Deadline
