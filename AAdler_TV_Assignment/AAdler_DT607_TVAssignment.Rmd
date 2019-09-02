@@ -1,6 +1,6 @@
 ---
-title: "Fall 2019 - Data 607 - Tideyverse Assignment"
-subtitle: "Kaggle: Boston Crimes & Tidyverse"
+title: "Fall 2019---Data 607---Tidyverse Assignment"
+subtitle: "Task 1: Kaggle---Boston Crimes & Tidyverse"
 author: "Avraham Adler"
 date: "9/2/2019"
 output:
@@ -15,28 +15,27 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 # Introduction
-I exclusivly use the Windows operating system, and may make mention of software for that ecosystem. There should be similar alternates for Mac or Linux.
+I exclusively use the Windows operating system, and may make mention of software for that ecosystem. There should be similar alternates for Mac or Linux.
 
-# TidyVerse Assignment Instructions
+# Tidyverse Assignment Instructions
 You have two tasks:
 
-  1. Create an Example.  Using one or more TidyVerse packages, and any dataset from [fivethirtyeight.com](https://data.fivethirtyeight.com/) or [Kaggle](https://www.kaggle.com/datasets), create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
+  1. Create an Example.  Using one or more Tidyverse packages, and any data set from [fivethirtyeight.com](https://data.fivethirtyeight.com/) or [Kaggle](https://www.kaggle.com/datasets), create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected Tidyverse package with your selected data set. (25 points)
   1. Extend an Existing Example.  Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
 
-# Task 1
-## Tidyverse packages
-The Tidyverse packages demonstrated in this vignette will be `readr`, `dplyr`.
+# Tidyverse packages
+The Tidyverse packages demonstrated in this vignette will be `readr`, `dplyr`, and `ggplot2`.
 
-## Dataset
-The dataset that I will be using is Kaggle's [Crimes in Boston](https://www.kaggle.com/AnalyzeBoston/crimes-in-boston). For simplification purposes, and because Kaggle requires a login which I do not wish to expose, I have already downloaded the ZIP file and extracted it to a local folder.
+# Data set
+The data set that I will be using is Kaggle's [Crimes in Boston](https://www.kaggle.com/AnalyzeBoston/crimes-in-boston). For simplification purposes, and because Kaggle requires a login which I do not wish to expose, I have already downloaded the ZIP file and extracted it to a local folder.
 
-### Context & Content
-> Crime incident reports are provided by Boston Police Department (BPD) to document the initial details surrounding an incident to which BPD officers respond. This is a dataset containing records from the new crime incident report system, which includes a reduced set of fields focused on capturing the type of incident as well as when and where it occurred. Records begin in June 14, 2015 and continue to September 3, 2018.
+## Context & Content
+> Crime incident reports are provided by Boston Police Department (BPD) to document the initial details surrounding an incident to which BPD officers respond. This is a data set containing records from the new crime incident report system, which includes a reduced set of fields focused on capturing the type of incident as well as when and where it occurred. Records begin in June 14, 2015 and continue to September 3, 2018.
 
 Quoted from Kaggle's description.
 
-## Preliminary Exploration
-### Loading the files into R
+# Preliminary Exploration
+## Loading the files into R
 The `readr` package is the tidyverse upgrade for base R's `read.XXXX` commands. It uses underscores instead of dots to separate the verb from the type of file. As the Kaggle files are CSVs, we will use the `read_csv` command. This also creates a tibble and not a data.frame, in line with the tidyverse mentality.
 ```{r loadPackages, include=FALSE}
 library(readr)
@@ -63,9 +62,36 @@ Note now there are no failure messages. This does expose one class of "problems"
 
 Also note the passed `locale` argument. Trial and error showed an issue with the import having to do with the assumed locale vs. the file encoding. This solved the issue. One more element of which a data scientist needs to be aware.
 
-### Explorations
-Let's get an idea of what this dataset contains. The `glimpse` command is the tidyverse equivalent of `str`. While `str` returns the expected for a data frame or a data table, for a tibble, the columnar attribute metadata is stored differently and will be appended to the output (try it), so the equivalent tidyverse command is `glimpse`.
+## Data Content
+Let's get an idea of what this data set contains. The `glimpse` command is the tidyverse equivalent of `str`. While `str` returns the expected for a data frame or a data table, for a tibble, the columnar attribute metadata is stored differently and will be appended to the output (try it), so the equivalent tidyverse command is `glimpse`.
 ```{r glimpseFiles}
 glimpse(Codes)
 glimpse(Crimes)
 ```
+
+What we see is that the Codes file contains more specific data about the crimes committed in the crimes file, and the foreign key is the Offence Code.
+
+# `dplyr` usage
+## Joins
+First, let's use `dplyr` verbs to join the two data sets. Then we'll extract a subset of the Crimes using `dplyr` verbs. We will look at the distribution of crimes by day of the week and hour of the day.[^1]
+
+[^1]: Despite my personal aversion to `magrittr`-style piping, as that is the *lingua franca* of the tidyverse, it will be used.
+```{r dplyrJoin}
+CrimesAugmented <- Crimes %>% inner_join(Codes, by = c("OFFENSE_CODE" = "CODE"))
+CrimesAugmented
+```
+
+Since the full table is too wide to display in this vignette, let's look at the first few rows and the offense description, remembering that the joined column is called `NAME`.
+```{r CAsmall}
+CrimesAugmented[1:5, c(1, 2, 3, 4, 18)]
+```
+
+## Subsetting
+As our interest lies in the distribution of crimes by day of week and time of day, we should focus on those fields. The `dplyr` verb for extracting columns is `select`.
+```{r selectColumns}
+CAsubset <- CrimesAugmented %>% select(c("INCIDENT_NUMBER", "OFFENSE_CODE", "OFFENSE_CODE_GROUP", "OCCURRED_ON_DATE", "DAY_OF_WEEK", "HOUR"))
+CAsubset
+```
+
+## Grouping
+Let's count the number of crimes that occurred on each day of the week, and see if there is any correlation or if the distribution is uniform. To do this, we will use `dplyr`'s grouping commands, which is conveniently `group_by`.
