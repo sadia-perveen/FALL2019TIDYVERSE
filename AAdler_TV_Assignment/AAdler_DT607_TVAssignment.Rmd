@@ -1,0 +1,71 @@
+---
+title: "Fall 2019 - Data 607 - Tideyverse Assignment"
+subtitle: "Kaggle: Boston Crimes & Tidyverse"
+author: "Avraham Adler"
+date: "9/2/2019"
+output:
+  html_document: default
+  pdf_document:
+    extra_dependencies:
+      amsmath: null
+      inputenc: utf8
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Introduction
+I exclusivly use the Windows operating system, and may make mention of software for that ecosystem. There should be similar alternates for Mac or Linux.
+
+# TidyVerse Assignment Instructions
+You have two tasks:
+
+  1. Create an Example.  Using one or more TidyVerse packages, and any dataset from [fivethirtyeight.com](https://data.fivethirtyeight.com/) or [Kaggle](https://www.kaggle.com/datasets), create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
+  1. Extend an Existing Example.  Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+
+# Task 1
+## Tidyverse packages
+The Tidyverse packages demonstrated in this vignette will be `readr`, `dplyr`.
+
+## Dataset
+The dataset that I will be using is Kaggle's [Crimes in Boston](https://www.kaggle.com/AnalyzeBoston/crimes-in-boston). For simplification purposes, and because Kaggle requires a login which I do not wish to expose, I have already downloaded the ZIP file and extracted it to a local folder.
+
+### Context & Content
+> Crime incident reports are provided by Boston Police Department (BPD) to document the initial details surrounding an incident to which BPD officers respond. This is a dataset containing records from the new crime incident report system, which includes a reduced set of fields focused on capturing the type of incident as well as when and where it occurred. Records begin in June 14, 2015 and continue to September 3, 2018.
+
+Quoted from Kaggle's description.
+
+## Preliminary Exploration
+### Loading the files into R
+The `readr` package is the tidyverse upgrade for base R's `read.XXXX` commands. It uses underscores instead of dots to separate the verb from the type of file. As the Kaggle files are CSVs, we will use the `read_csv` command. This also creates a tibble and not a data.frame, in line with the tidyverse mentality.
+```{r loadPackages, include=FALSE}
+library(readr)
+library(dplyr)
+```
+
+Let's start with the code file.
+```{r readCodes}
+Codes <- read_csv('./offense_codes.csv')
+```
+
+Note that `read_csv` makes intelligent assumptions about the variable classes of the columns. Now let's try the crimes file.
+```{r readCrimes}
+Crimes <- read_csv('./crime.csv')
+```
+
+Not as simple. What this demonstrates that it often pays to look at the structure of the file before importing it blindly. First, the Kaggle page itself suggests variable types for the fields. One can also manually investigate the files. When dealing with text files (.csv, .txt, .log usually, etc.), if they are small, then software such as Notepad, [Notepad++](https://notepad-plus-plus.org/), or even Microsoft Excel is useful. When the number of rows is measured in the millions or greater, my suggestion is to use [glogg](https://glogg.bonnefon.org/). Let's try importing the file with specific classes for the columns based on the suggestions at the Kaggle page and some other specific arguments.
+```{r readFiles2}
+Codes <- read_csv('./offense_codes.csv', col_types = "ic")
+Crimes <- read_csv('./crime.csv', col_types = "cicccccTiiciccddc", locale = locale(encoding = "latin1"))
+```
+
+Note now there are no failure messages. This does expose one class of "problems" with the tidyverse: function arguments do not follow base R. In base R, for example, the argument to pass a vector of variable types is called `colClasses`. The `data.table` package retained this name, but `readr` calls it `col_types`. For people whose entry into the R ecosystem is the tidyverse and who will remain there, that isn't a big deal. For more experienced (read older) users or those who need to branch outside the tidyverse, it pays to remember and always make certain you know what the proper argument names are.
+
+Also note the passed `locale` argument. Trial and error showed an issue with the import having to do with the assumed locale vs. the file encoding. This solved the issue. One more element of which a data scientist needs to be aware.
+
+### Explorations
+Let's get an idea of what this dataset contains. The `glimpse` command is the tidyverse equivalent of `str`. While `str` returns the expected for a data frame or a data table, for a tibble, the columnar attribute metadata is stored differently and will be appended to the output (try it), so the equivalent tidyverse command is `glimpse`.
+```{r glimpseFiles}
+glimpse(Codes)
+glimpse(Crimes)
+```
