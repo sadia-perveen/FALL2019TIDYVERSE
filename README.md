@@ -17,3 +17,9 @@ In this assignment, you’ll practice collaborating around a code project with G
 * GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
+
+# Projects
+
+|Name|Source|Data Set|
+|----|------|--------|
+|Avraham Adler|Kaggle|Boston Crimes|
