@@ -7,7 +7,7 @@ output: html_document
 
 ## Rpubs link: http://rpubs.com/ssufian/548044
 
-## Github: https://github.com/ssufian/FALL2019TIDYVERSE
+## Github: https://github.com/ssufian/FALL2019TIDYVERSE/blob/master/Data-607-Tidyverse-Project-orig.Rmd
 
 
 --------------------------------------------------------------------------------
@@ -210,4 +210,15 @@ weather4 <- weather3 %>%
 head(weather4)
 ```
 
+##  Tidyverse Capability 4
+
+Description:
+
+- Using top_n function to select and order top n entries
+
+```{r}
+weather5 <- weather4 %>% top_n(actual_mean_temp, n= 5)
+
+(weather5)
+```
 
