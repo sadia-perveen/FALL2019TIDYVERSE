@@ -1,4 +1,4 @@
-# CUNY DATA 607 Fall 2019 Tidyverse recipes
+﻿# CUNY DATA 607 Fall 2019 Tidyverse recipes
 
 You have two tasks:
 
@@ -17,3 +17,5 @@ In this assignment, you’ll practice collaborating around a code project with G
 * GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
+
+**TEST**
