@@ -18,4 +18,6 @@ In this assignment, you’ll practice collaborating around a code project with G
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
-**TEST**
+**TidyVerse Vignette Assignment -- Zach Alexander**
+
+* Part 1: I will be making a TidyVerse vignette for the dplyr and tidyr packages, using the NFL elo ratings dataset from FiveThirtyEight.
