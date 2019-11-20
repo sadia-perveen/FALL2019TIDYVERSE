@@ -20,4 +20,4 @@ In this assignment, you’ll practice collaborating around a code project with G
 
 **TidyVerse Vignette Assignment -- Zach Alexander**
 
-* Part 1: I will be making a TidyVerse vignette for the dplyr and tidyr packages, using the NFL elo ratings dataset from FiveThirtyEight.
+* Part 1: I will be making a TidyVerse vignette for the tidyr package, using the NFL elo ratings dataset from FiveThirtyEight.
