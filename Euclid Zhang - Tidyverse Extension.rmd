@@ -1,0 +1,204 @@
+---
+title: "DATA607_TidyVerse_assignment1"
+author: "Lin Li - extended by Zach Alexander"
+date: "11/20/2019"
+output: html_document
+---
+
+Create an Example.  Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. 
+
+1. Get dataset from 538.
+
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+weather <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/us-weather-history/KCLT.csv")
+```
+
+2. tidyr separate function:
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+library(tidyr)
+weather2 <- weather %>% separate(date, c("year", "month", "day"), sep = "-")
+```
+
+3. dplyr select function:
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+library(dplyr)
+select_data <- select(weather2, year, actual_mean_temp, record_min_temp, record_max_temp, record_precipitation)
+```
+
+
+***
+
+#### Zach's Extension - dplyr package
+
+***  
+
+**I've commented out Euclid's work in order to make it easier to follow my extension**  
+
+Sometimes, it's valuable to manipulate a dataset into smaller groups, and to summarize information based on column values. We can use TidyVerse packages and built-in functions to accomplish this.
+
+To extend Euclid's example, I'll also use the `summarise()`, `group_by()`, `mutate()`, `arrange()`, and `mean()` functions in the __dplyr__ package to obtain the average actual maximum temperature by month for 2014:
+
+```{r, message=FALSE, warning=FALSE}
+weather2_group <- weather2 %>% 
+  group_by(month) %>% 
+  summarise(max_temp_mean = mean(actual_max_temp)) %>%
+  mutate(month = as.numeric(month)) %>% # in order to arrange by month, need to convert to numeric
+  arrange(month)
+```
+
+```{r, echo=FALSE}
+weather2_group
+```
+
+* `summarise()` -- applies summary functions to the actual_max_temp column in order to create a new table. In our case, it took the actual_max_temp of each day.  
+
+* `group_by()` -- created a grouped copy of our table, so that we were only getting the mean temperatures by month.  
+
+* `mutate()` -- creates a new column, and in our case it created the new column _maxtempmean_.  
+
+* `arrange()` -- orders the rows by values of a column, in our case we ordered the new table by the month number, from 1 to 12.  
+
+* `mean()` -- takes the mean of values, in our case it took the mean of the actual_max_temp values, grouped by month.
+
+
+***
+
+#### Zach's Extension - using ggplot2
+
+***  
+
+Additionally, similar to Euclid, I'll use the ggplot2 package to display data present in the weather dataset.  
+
+In our example, we'll create a facet bar chart that compares the average actual max temperature for 2014 to the average record max temperature for each month:  
+
+Before plotting, we'll have to create a new column that includes the average record max temperature for each month:
+
+```{r, message=FALSE, warning=FALSE}
+weather2_group_record <- weather2 %>% 
+  group_by(month) %>% 
+  summarise(record_max_temp_mean = mean(record_max_temp)) %>%
+  mutate(month = as.numeric(month)) %>% # in order to arrange by month, need to convert to numeric
+  arrange(month)
+```
+
+Then, we'll combine the mean values from both datasets into one dataset and use the __tidyr__ package to tidy the data into a format conducive to plotting. For this section, I used the `gather()` function to do this:  
+
+```{r}
+weather_final <- merge(weather2_group, weather2_group_record, by = "month")
+
+weather_final <- weather_final %>% 
+  gather(max_temp_mean, record_max_temp_mean, key = '2014_record', value = 'temperature') %>% 
+  mutate(`2014_record` = ifelse(`2014_record` == 'max_temp_mean', '2014 average max', 'Record average max')) %>% 
+  arrange(month) %>% 
+  select(month, `2014_record`, temperature)
+
+months <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+
+for(i in 1:length(months)){
+  for (j in 1:length(weather_final$month)){
+    if(weather_final$month[j] == i){
+      weather_final$month[j] <- months[i]
+    }
+  }
+}
+
+weather_final
+```
+
+```{r, echo=FALSE}
+weather_final$month_f <- factor(weather_final$month, levels = months)
+```
+
+Now that the data is ready, we can plot this in a faceted bar graph, by month:
+
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+
+plot <- ggplot(weather_final, aes(x = ".", y = temperature, fill= `2014_record`))
+plot <- plot + scale_y_continuous()
+plot <- plot + theme(legend.position = "right", axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title = element_blank())
+plot <- plot + geom_bar(stat = "identity", position = "dodge", color="#dddddd")
+plot <- plot + facet_wrap(month_f ~ .)
+plot <- plot + geom_text(aes(label=format(temperature, digits = 0)), vjust = 1.5, position = position_dodge(0.9), color="#ffffff", fontface="bold")
+plot <- plot + theme(legend.title = element_blank())
+plot
+```
+
+***
+
+
+
+4. dplyr filter (subsetting dataset)
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+library(dplyr)
+filter <- filter(weather2, year == "2014")
+```
+
+5. ggplot histogram for actual_mean_temp
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+library(ggplot2)
+ggplot(weather2, aes(actual_mean_temp)) + geom_bar()
+```
+
+
+ 
+---
+title: "DATA607_TidyVerse_assignment Part 2"
+author: "Euclid Zhang"
+date: "11/17/2019"
+---
+  
+Update with new examples of the Tidyverse packages used above (tidyr, dplyr and ggplot2)
+  
+tidyr::gather - a function that transform the values from multiple columns into one column, with the original column names as keys stored in a new created column.  
+For example, we can combine the actual_mean_temp, actual_min_temp and actual_max_temp into one columns:
+```{r, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+weather2 %>%
+  select(year:actual_max_temp) %>% 
+  gather("temp_type", "temperature", actual_mean_temp:actual_max_temp) %>% 
+  head()
+```
+dplyr::group_by - group the rows by the values in column(s)  
+dplyr::summarise - for each group determined by the group_by function, generate a summary value that is defined by a summary function such as mean()  
+dplyr::arrange - arrange the order of the rows by the values in column(s)   
+For example, we can group the rows by months and summarize the average of the mean temperature in each month:
+```{r, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+weather2 %>% 
+  group_by(year, month) %>% 
+  summarise(average = mean(actual_mean_temp)) %>% 
+  arrange(as.integer(year),as.integer(month))
+```
+
+ggplot2 - the package provides various functions to plot multuple components on the same graph.  
+For example, the geom_line function plots and connects each (x,y) pairs from provided input lists x and y.  
+The geom_smooth function plots a smooth line accross the points.  
+Labels can be created by the labs function.  
+In the following example we plot the actual mean temperature of 365 days
+```{r, message=FALSE, echo=FALSE, eval=FALSE}
+temp <- ggplot(weather2, aes(x=c(1:365), y=weather2$actual_mean_temp)) + 
+  geom_line(color = "orange") +
+  geom_smooth() +
+  labs(title="Daily Mean Temperature from 07/01/2014 to 06/30/2015",
+       x="Day",
+       y="temperature (Fahrenheit)")
+plot(temp)
+```
+
+We can also plot multiple lines on the same graph. For example, we can add the actual min temperature and max temperature to the same plot.
+```{r, message=FALSE, echo=FALSE, eval=FALSE}
+temp <- ggplot(weather2, aes(x=c(1:365), y=weather2$actual_mean_temp)) + 
+  geom_line(aes(y=weather2$actual_mean_temp),color = "orange") +
+  geom_smooth(color = "black") +
+  labs(title="Daily Temperature from 07/01/2014 to 06/30/2015",
+       subtitle = "Orange = Mean, Red = Max, Blue = Min",
+       x="Day",
+       y="temperature (Fahrenheit)") +
+  geom_line(aes(y=weather2$actual_min_temp),color = "blue") +
+  geom_line(aes(y=weather2$actual_max_temp),color = "red")
+plot(temp)
+```
+
