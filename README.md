@@ -20,6 +20,8 @@ In this assignment, you’ll practice collaborating around a code project with G
 
 ## Vignettes
 ### Create a Document Term Matrix
+Author: Jai Jeffryes
+
 A document term matrix (DTM) is a data structure that can serve as the input to machine learning models. Tidyverse tools can create this structure.
 
 cf. `candidate_email_dtm.Rmd`
