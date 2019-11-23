@@ -1,0 +1,116 @@
+---
+title: "Tidyverse"
+author: "Donny Lofland"
+date: "November 23, 2019"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Library & Helpers
+
+```{r library, message=FALSE}
+library(tidyverse)
+library(lubridate)
+
+# This helper function will load URL data and store it locally 
+# in a data/ folder for future loading without having to 
+# redownload the file every time.  The function will create the
+# data/ folder if it doesn't already exist.
+# 
+# Note that we are using the readr write_csv() method
+load_cached_url <- function(filename, url) {
+  dir.create(file.path('.', 'data'), showWarnings = FALSE)
+  fqfn <- paste('./data', filename, sep = '/')
+  
+  if(file.exists(fqfn)) {
+    data <- read_csv(fqfn)
+  } else {
+    data <- read_csv(url)
+    write_csv(data, fqfn)
+  }
+  
+  return(as_tibble(data))
+}
+```
+
+## Data Set(s)
+FiveThirtyEight has aggregated polling data from a number of sources tracking Trump's approval rating since January 2017.  In this programming vignette, we will use TidyVerse packages to load, manipulate, summarize and plot Trump's approval rating over time. 
+
+URL: https://github.com/fivethirtyeight/data/tree/master/trump-approval-ratings
+
+There are two CSV files of interest:
+- [Approved Polls](https://projects.fivethirtyeight.com/trump-approval-data/approval_polllist.csv)
+- [Poll Results](https://projects.fivethirtyeight.com/trump-approval-data/approval_topline.csv)
+
+## readr - read_csv() method
+The readr package provides methods for loading and saving data from both the local file system and from url's where data is hosted online.  We will use the read_csv() and write_csv() method to load our CSV data and save it to a local cache.
+
+```{r read_csv1, eval=TRUE, message=FALSE}
+
+polls <- load_cached_url(
+  'trump-approval-ratings-polls.csv', 
+  'https://projects.fivethirtyeight.com/trump-approval-data/approval_polllist.csv'
+  )
+
+
+results <- load_cached_url(
+  'trump-approval-ratings-results.csv',
+  'https://projects.fivethirtyeight.com/trump-approval-data/approval_topline.csv')
+
+head(polls)
+head(results)
+```
+
+## lubridate
+
+Let's make sure all date columns are treated as a date format using lubridate's mdy()
+
+```{r}
+date_cols <- c('modeldate', 'startdate', 'enddate', 'createddate')
+
+polls$modeldate   <- mdy(polls$modeldate)
+polls$startdate   <- mdy(polls$startdate)
+polls$enddate     <- mdy(polls$enddate)
+polls$createddate <- mdy(polls$createddate)
+
+results$modeldate   <- mdy(results$modeldate)
+```
+
+## dplyr - filter() & select()
+
+The dplyr:filter() function allows us to filter rows much like a 'where' statement in SQL.  Here, we will only consider polls of Voters.  The dplyr:select() function will limit which columns are returned.  Here, we only want the date, approval and disapproval values.  The dplyr:arrange() functions allows us to sort the rows by model date.  We leverage the dyplr:gather() function to convert our tibble from wide to long format which aids with plotting.
+
+```{r filter, eval=TRUE}
+# example filtering, selecting an sorting data
+res <- results %>%
+  filter(subgroup == 'Voters') %>%
+  select(modeldate, approve_estimate, disapprove_estimate) %>%
+  arrange(modeldate)
+
+# example creating a new column
+res <- res %>%
+  mutate(gap = (approve_estimate - disapprove_estimate))
+
+# example converting to long format for plotting
+res <- res %>% 
+  gather('type', 'value', -modeldate) 
+
+head(res)
+```
+
+## ggplot2
+
+Let's see how Trump's approval and disapproval ratings have varied over time.  We also plot the gap, calculated as approval minus disapproval.  We see that very early into his term, Trump's disapproval rating exceeded his approval rating and he has maintained a negative gap throughout his presidency.  
+
+```{r}
+# Multiple line plot
+ggplot(res, aes(x = modeldate, y = value)) + 
+  geom_area(aes(color = type, fill = type), 
+            alpha = 0.2, position = position_dodge(0.8)) +
+  scale_color_manual(values = c("#00FF00", "#ff0000", "#ff0000")) +
+  scale_fill_manual(values = c("#00FF00", "#ff0000", "#E7B800")) 
+```
+
