@@ -48,6 +48,18 @@ The candidate emails are formatted as HTML files. They reside in directories nam
 - The corpus variables are: `email_id`, `class`, and `email`. I initialize an empty `tibble`, a form of data frame with some extra conveniences. One of them is that in order for a character column to be created as a factor, it must be coded explicitly. Character data is not converted to factors by default. We will need factors for grouping in `dplyr`, so the corpus variable `class` is initialized as a factor.
 
 ```{r}
+# Check if we already have the data folder available - if not, let's download a local copy
+if(!(file.exists('./candidate-emails'))) {
+  # download into the placeholder file
+  download.file("https://github.com/fivethirtyeight/candidate-emails/archive/master.zip", 'master.zip')
+
+  # unzip the file to the temporary directory
+  unzip('master.zip', exdir='.', overwrite=TRUE)
+  
+  # Remove the "-master" that GitHub appended (it was the branch name)
+  file.rename('./candidate-emails-master', './candidate-emails')
+}
+
 email_dir <- "candidate-emails/emails"
 candidates <- list.dirs(email_dir, full.names = FALSE)
 is_candidate_empty <- candidates == ""
