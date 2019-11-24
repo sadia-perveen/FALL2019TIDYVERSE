@@ -24,13 +24,32 @@ library(lubridate)
 load_cached_url <- function(filename, url) {
   dir.create(file.path('.', 'data'), showWarnings = FALSE)
   fqfn <- paste('./data', filename, sep = '/')
-  
-  if(file.exists(fqfn)) {
-    data <- read_csv(fqfn)
-  } else {
+
+  # Download the file and save it, if we don't have it yet.  
+  if(!file.exists(fqfn)) {
     data <- read_csv(url)
     write_csv(data, fqfn)
   }
+
+  # Guess column specification.
+  fqfn_spec <- spec_csv(fqfn)
+  
+  # Identify date columns.
+  # Assumption: Column name ends with "date".
+  date_cols <- names(fqfn_spec$cols)[str_detect(names(fqfn_spec$cols),
+                                     pattern = "date$")]
+  
+  # Remove one of the date column names, in order to illustrate later the
+  # alternative of specifying datatype after reading, too.
+  date_cols <- date_cols[-1]
+
+  # Set specification explicitly for date columns.
+  for (column in date_cols) {
+    fqfn_spec$cols[[column]] <- col_date("%m/%d/%Y")  
+  }
+  
+  # Read file, setting datatypes for all columns.
+  data <- read_csv(fqfn, col_types = fqfn_spec)
   
   return(as_tibble(data))
 }
@@ -45,8 +64,12 @@ There are two CSV files of interest:
 - [Approved Polls](https://projects.fivethirtyeight.com/trump-approval-data/approval_polllist.csv)
 - [Poll Results](https://projects.fivethirtyeight.com/trump-approval-data/approval_topline.csv)
 
-## readr - read_csv() method
+## readr - read_csv() and spec_csv() methods
 The readr package provides methods for loading and saving data from both the local file system and from url's where data is hosted online.  We will use the read_csv() and write_csv() method to load our CSV data and save it to a local cache.
+
+spec_csv() allows us to specify datatypes for the read. If identification of datatypes can be generalized, we can program the coercion of datatype at run time of the read. In this illustration, the names of date columns for each input file all end with "date". Therefore, we can specify the date datatype upon reading the files.
+
+Otherwise, it is necessary to coerce datatypes after reading. In order to illustrate this later, we code this vignette intentionally to miss one of the date columns.
 
 ```{r read_csv1, eval=TRUE, message=FALSE}
 
@@ -66,16 +89,12 @@ head(results)
 
 ## lubridate
 
-Let's make sure all date columns are treated as a date format using lubridate's mdy()
+In order to demonstrate lubridate, our file reading function intentionally omitted setting the datatype of the first date columns. Let's now make sure all date columns are treated as a date format using lubridate's mdy(). 
 
 ```{r}
 date_cols <- c('modeldate', 'startdate', 'enddate', 'createddate')
 
 polls$modeldate   <- mdy(polls$modeldate)
-polls$startdate   <- mdy(polls$startdate)
-polls$enddate     <- mdy(polls$enddate)
-polls$createddate <- mdy(polls$createddate)
-
 results$modeldate   <- mdy(results$modeldate)
 ```
 

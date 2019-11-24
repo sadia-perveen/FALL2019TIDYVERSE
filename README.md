@@ -25,3 +25,10 @@ Author: Jai Jeffryes
 A document term matrix (DTM) is a data structure that can serve as the input to machine learning models. Tidyverse tools can create this structure.
 
 cf. `candidate_email_dtm.Rmd`
+
+### Trump Approval Ratings from FiveThirtyEight
+Author: Donny Lofland
+
+FiveThirtyEight has aggregated polling data from a number of sources tracking Trump's approval rating since January 2017.  In this programming vignette, we will use TidyVerse packages to load, manipulate, summarize and plot Trump's approval rating over time. 
+
+cf. `trump_approval_ratings.Rmd`
