@@ -13,13 +13,32 @@ Library & Helpers
     load_cached_url <- function(filename, url) {
       dir.create(file.path('.', 'data'), showWarnings = FALSE)
       fqfn <- paste('./data', filename, sep = '/')
-      
-      if(file.exists(fqfn)) {
-        data <- read_csv(fqfn)
-      } else {
+
+      # Download the file and save it, if we don't have it yet.  
+      if(!file.exists(fqfn)) {
         data <- read_csv(url)
         write_csv(data, fqfn)
       }
+
+      # Guess column specification.
+      fqfn_spec <- spec_csv(fqfn)
+      
+      # Identify date columns.
+      # Assumption: Column name ends with "date".
+      date_cols <- names(fqfn_spec$cols)[str_detect(names(fqfn_spec$cols),
+                                         pattern = "date$")]
+      
+      # Remove one of the date column names, in order to illustrate later the
+      # alternative of specifying datatype after reading, too.
+      date_cols <- date_cols[-1]
+
+      # Set specification explicitly for date columns.
+      for (column in date_cols) {
+        fqfn_spec$cols[[column]] <- col_date("%m/%d/%Y")  
+      }
+      
+      # Read file, setting datatypes for all columns.
+      data <- read_csv(fqfn, col_types = fqfn_spec)
       
       return(as_tibble(data))
     }
@@ -40,13 +59,23 @@ Polls](https://projects.fivethirtyeight.com/trump-approval-data/approval_polllis
 - [Poll
 Results](https://projects.fivethirtyeight.com/trump-approval-data/approval_topline.csv)
 
-readr - read\_csv() method
---------------------------
+readr - read\_csv() and spec\_csv() methods
+-------------------------------------------
 
 The readr package provides methods for loading and saving data from both
 the local file system and from url’s where data is hosted online. We
 will use the read\_csv() and write\_csv() method to load our CSV data
 and save it to a local cache.
+
+spec\_csv() allows us to specify datatypes for the read. If
+identification of datatypes can be generalized, we can program the
+coercion of datatype at run time of the read. In this illustration, the
+names of date columns for each input file all end with “date”.
+Therefore, we can specify the date datatype upon reading the files.
+
+Otherwise, it is necessary to coerce datatypes after reading. In order
+to illustrate this later, we code this vignette intentionally to miss
+one of the date columns.
 
     polls <- load_cached_url(
       'trump-approval-ratings-polls.csv', 
@@ -61,19 +90,19 @@ and save it to a local cache.
     head(polls)
 
     ## # A tibble: 6 x 22
-    ##   president subgroup modeldate startdate enddate pollster grade samplesize
-    ##   <chr>     <chr>    <chr>     <chr>     <chr>   <chr>    <chr>      <dbl>
-    ## 1 Donald T… All pol… 11/22/20… 1/20/2017 1/22/2… Morning… B/C         1992
-    ## 2 Donald T… All pol… 11/22/20… 1/20/2017 1/22/2… Gallup   B           1500
-    ## 3 Donald T… All pol… 11/22/20… 1/20/2017 1/24/2… Ipsos    B-          1632
-    ## 4 Donald T… All pol… 11/22/20… 1/21/2017 1/23/2… Gallup   B           1500
-    ## 5 Donald T… All pol… 11/22/20… 1/22/2017 1/24/2… Rasmuss… C+          1500
-    ## 6 Donald T… All pol… 11/22/20… 1/20/2017 1/25/2… Quinnip… B+          1190
-    ## # … with 14 more variables: population <chr>, weight <dbl>,
-    ## #   influence <dbl>, approve <dbl>, disapprove <dbl>,
+    ##   president subgroup modeldate startdate  enddate    pollster grade
+    ##   <chr>     <chr>    <chr>     <date>     <date>     <chr>    <chr>
+    ## 1 Donald T… All pol… 11/22/20… 2017-01-20 2017-01-22 Morning… B/C  
+    ## 2 Donald T… All pol… 11/22/20… 2017-01-20 2017-01-22 Gallup   B    
+    ## 3 Donald T… All pol… 11/22/20… 2017-01-20 2017-01-24 Ipsos    B-   
+    ## 4 Donald T… All pol… 11/22/20… 2017-01-21 2017-01-23 Gallup   B    
+    ## 5 Donald T… All pol… 11/22/20… 2017-01-22 2017-01-24 Rasmuss… C+   
+    ## 6 Donald T… All pol… 11/22/20… 2017-01-20 2017-01-25 Quinnip… B+   
+    ## # … with 15 more variables: samplesize <dbl>, population <chr>,
+    ## #   weight <dbl>, influence <dbl>, approve <dbl>, disapprove <dbl>,
     ## #   adjusted_approve <dbl>, adjusted_disapprove <dbl>,
     ## #   multiversions <chr>, tracking <lgl>, url <chr>, poll_id <dbl>,
-    ## #   question_id <dbl>, createddate <chr>, timestamp <chr>
+    ## #   question_id <dbl>, createddate <date>, timestamp <chr>
 
     head(results)
 
@@ -92,16 +121,14 @@ and save it to a local cache.
 lubridate
 ---------
 
-Let’s make sure all date columns are treated as a date format using
-lubridate’s mdy()
+In order to demonstrate lubridate, our file reading function
+intentionally omitted setting the datatype of the first date columns.
+Let’s now make sure all date columns are treated as a date format using
+lubridate’s mdy().
 
     date_cols <- c('modeldate', 'startdate', 'enddate', 'createddate')
 
     polls$modeldate   <- mdy(polls$modeldate)
-    polls$startdate   <- mdy(polls$startdate)
-    polls$enddate     <- mdy(polls$enddate)
-    polls$createddate <- mdy(polls$createddate)
-
     results$modeldate   <- mdy(results$modeldate)
 
 dplyr - filter() & select()
