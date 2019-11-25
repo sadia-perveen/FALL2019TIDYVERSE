@@ -18,6 +18,5 @@ In this assignment, you’ll practice collaborating around a code project with G
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
-Tidyverse Vignette, Part 1 - FiveThirtyEight Soccer Power Index (https://projects.fivethirtyeight.com/soccer-predictions/)
-Tidyverse Vignette, Part 2 - An extension of the work of Suwarman Sufian
-Charlie Rosemond
+Charlie Rosemond - Tidyverse Part 1 - FiveThirtyEight Soccer Power Index (https://projects.fivethirtyeight.com/soccer-predictions/)
+- Tidyverse Part 2 - An extension of the work of Suwarman Sufian
