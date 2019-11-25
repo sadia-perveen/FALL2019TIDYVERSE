@@ -1,5 +1,5 @@
 ---
-title: "Tidyverse"
+title: "Tidyverse Part 1"
 author: "C. Rosemond"
 date: "November 2, 2019"
 output: md_document
