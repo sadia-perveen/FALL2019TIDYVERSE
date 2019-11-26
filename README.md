@@ -17,3 +17,12 @@ In this assignment, you’ll practice collaborating around a code project with G
 * GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
+
+-----------------------------------------------------------------------------------------------------------------------------------
+Vignettes:
+
+Part 1: Created a .Rmd document to demonstrate how to use some of the TidyVerse functions such as select(), mutate(), count() and ggplot(). 
+Rpubs: http://rpubs.com/marioipena/553779
+
+Part 2: Made an extension to the work of C. Rosemond to add a few more examples with the functions count() and ggplot().
+Github: https://github.com/chrosemo/FALL2019TIDYVERSE/pull/1/commits/7eb56a3490d59ef5ca4f29aaacea6b5c9ed4822f
