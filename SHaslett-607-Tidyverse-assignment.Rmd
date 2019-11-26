@@ -19,6 +19,11 @@ library(tidyverse)
 library(rmdformats)
 ```
 
+
+## Assignment Response
+
+For this assignment, I have chosen to demonstrate some of the basic functionailty supplied by the dplry, and ggplot packages that come with tidyverse.
+
 ## Datasource
 https://www.kaggle.com/residentmario/ramen-ratings/data
 
