@@ -1,9 +1,5 @@
 # CUNY DATA 607 Fall 2019 Tidyverse recipes
 
-You have two tasks:
-
-**Create an Example**  Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
-
 I am using the Avengers dataset from FiveThirtyEight and using the dplyr package to demonstrate the filter and full_join function.
 Avengers dataset: https://github.com/fivethirtyeight/data/tree/master/avengers
 
