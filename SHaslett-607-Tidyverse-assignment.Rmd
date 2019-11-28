@@ -22,7 +22,7 @@ library(rmdformats)
 
 ## Assignment Response
 
-For this assignment, I have chosen to demonstrate some of the basic functionailty supplied by the dplry, and ggplot packages that come with tidyverse.
+For this assignment, I have chosen to demonstrate the basic functionailty supplied by the dplry package that comes with tidyverse.
 
 ## Datasource
 https://www.kaggle.com/residentmario/ramen-ratings/data
@@ -36,7 +36,7 @@ ramen_ratings <- read.csv("https://raw.githubusercontent.com/stephen-haslett/FAL
 ```
 
 
-#### Check that the data has imported successfully.
+#### Check that the data imported successfully.
 
 ```{r, eval=TRUE, message=FALSE, warning=FALSE}
 ramen_ratings <- as_tibble(ramen_ratings)
@@ -44,13 +44,12 @@ head(ramen_ratings)
 ```
 
 
-## The dplyr Package
-
 #### Using the "dplyr" package's "slice" function, select a specific range of rows from the dataset.
 
 ```{r, eval=TRUE, message=FALSE, warning=FALSE}
 # Select rows 10 to 20 from the dataset.
-slice(ramen_ratings, 10:19)
+selected_rows <- slice(ramen_ratings, 10:19)
+selected_rows
 ```
 
 
@@ -58,28 +57,30 @@ slice(ramen_ratings, 10:19)
 
 ```{r, eval=TRUE, message=FALSE, warning=FALSE}
 # Select rows 2 to 9, 26 to 30, and rows 40, 21, 16, and 35.
-ramen_ratings %>% slice(c(2:9, 26:30, 40, 21, 16, 35))
+multiple_selected_rows <- ramen_ratings %>% slice(c(2:9, 26:30, 40, 21, 16, 35))
+multiple_selected_rows
 ```
 
 
-#### Use dplyr's package's "filter" function to select rows based on specified conditions.
+#### Use dplyr's "filter" function to select rows based on specified conditions.
 
-_In this example, we will only select rows that have 5 Star ratings._
+_In this example, we will only select rows that have a 5 Star rating._
 
 ```{r, eval=TRUE, message=FALSE, warning=FALSE}
-filter(ramen_ratings, Stars == 5)
+five_stars <- filter(ramen_ratings, Stars == 5)
+five_stars
 ```
 
 
-#### Finally, we will use dplyr's "select" function to select specific data columns from the dataset.
+#### Finally, use dplyr's "select" function to select specific data columns from the dataset.
 
 _In this example, we will select the "Brand", "Variety", "Country", "Stars", and "Top.Ten" columns for brands that have a Top.Ten listing._
 
 ```{r, eval=TRUE, message=FALSE, warning=FALSE}
-# Select only the rows with Top.Ten column values whilst removing those
-# with NA, empty, or "\n" Top.Ten column values.
-ramen_ratings <- filter(ramen_ratings, Top.Ten != "" & !is.na(Top.Ten) & Top.Ten != "\n")
+# Select only the rows with Top.Ten column entries whilst removing those
+# with NA, empty, or "\n" values.
+ramen_ratings_filtered <- filter(ramen_ratings, Top.Ten != "" & !is.na(Top.Ten) & Top.Ten != "\n")
 
-ramen_top_ten <- select(ramen_ratings, c("Brand", "Variety", "Country", "Stars", "Top.Ten"))
+ramen_top_ten <- select(ramen_ratings_filtered, c("Brand", "Variety", "Country", "Stars", "Top.Ten"))
 ramen_top_ten
 ```
