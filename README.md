@@ -18,5 +18,7 @@ In this assignment, you’ll practice collaborating around a code project with G
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
-Adding SHaslett-607-Tidyverse-assignment.Rmd.
-  - Demonstrastes the "dplyr" package that comes with Tidyverse.
+Stephen Haslett - Data 607 Tidyverse Assignment
+Task 1: SHaslett-607-Tidyverse-assignment.Rmd. For task 1, I imported the ramen-ratings dataset from Kaggle (https://www.kaggle.com/residentmario/ramen-ratings/data)
+into R using the "readr" package. I then demonstrated the dplyr package's "slice", "filter", and "select" functions.
+
