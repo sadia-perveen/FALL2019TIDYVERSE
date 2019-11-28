@@ -14,9 +14,9 @@ You should complete both parts of the assignment and make your submission no lat
 
 In this assignment, you’ll practice collaborating around a code project with GitHub.  You could consider our collective work as building out a book of examples on how to use TidyVerse functions.
 
-Adding SHaslett-607-Tidyverse-assignment.Rmd.
-  - Demonstrastes the "dplyr" package that comes with Tidyverse.
-
 * GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
+
+Adding SHaslett-607-Tidyverse-assignment.Rmd.
+  - Demonstrastes the "dplyr" package that comes with Tidyverse.
