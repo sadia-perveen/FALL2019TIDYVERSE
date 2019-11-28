@@ -18,7 +18,19 @@ In this assignment, you’ll practice collaborating around a code project with G
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
-Stephen Haslett - Data 607 Tidyverse Assignment
-Task 1: SHaslett-607-Tidyverse-assignment.Rmd. For task 1, I imported the ramen-ratings dataset from Kaggle (https://www.kaggle.com/residentmario/ramen-ratings/data)
+--------------------------------------------------------------------------------------------
+
+**Stephen Haslett - Data 607 Tidyverse Assignment**
+
+**GitHub Repository**: https://github.com/stephen-haslett/FALL2019TIDYVERSE
+
+**Data Source**: https://www.kaggle.com/residentmario/ramen-ratings/data
+
+**RPubs Location**: http://rpubs.com/stephenhaslett/554575
+
+**Task 1**: SHaslett-607-Tidyverse-assignment.Rmd. For task 1, I imported the ramen-ratings dataset from Kaggle (https://www.kaggle.com/residentmario/ramen-ratings/data)
 into R using the "readr" package. I then demonstrated the dplyr package's "slice", "filter", and "select" functions.
 
+**Task2**: SHaslett-Task-2-Jayanth-Add-ggplot.Rmd. For task 2, I added a ggplot Bar Plot to Jayanth0572's US Breweries assignment - https://github.com/jayanth0572/FALL2019TIDYVERSE.
+
+--------------------------------------------------------------------------------------------
