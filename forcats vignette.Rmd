@@ -1,0 +1,112 @@
+---
+title: "Forcats Vignette using FiveThirtyEight ELO Dataset"
+author: "Steven Ellingson"
+date: "November 24, 2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+The purpose of this vignette is to explore the "forcats" package.  I will be using a dataset from 538 that gives the expected win percentage of every NBA game, called "ELO". Forcats gives some nice options for working with displaying categorical data.  I'm going to focus on "team1" as the variable.
+
+We'll start by reading the ELO dataset and taking a look at the columns.
+```{r, warning=FALSE, message=FALSE}
+library(forcats)
+library(dplyr)
+library(readr)
+```
+
+```{r}
+elo <- read_csv("https://projects.fivethirtyeight.com/nba-model/nba_elo.csv")
+str(elo)
+```
+
+In order to use forcats, we need the variable(s) we're going to use to be encoded as factors. 
+Let's take the character variable team1 and change to factor.  
+```{r}
+elo$team1 = as.factor(elo$team1)
+```
+
+Let's take a look at the levels of the variable.  
+```{r}
+table(elo$team1)
+
+```
+
+The levels are in alphabetical order. Let's see how it looks if we sort by the first game the team played instead. We'll use fct_reorder.  We need to specify that "date" is the column we want to use, and the aggregate function will be "min". 
+
+```{r}
+table(fct_reorder(.f = elo$team1, .x = elo$date, .fun = min))
+
+```
+
+Knowing a bit about NBA history can help us confirm this makes sense.  The last team on the list "BRK" represents the Brooklyn Nets, the most recent team to enter the league.  
+
+It might be easier to look at if they were sorted be frequency.  For that we'll use "fct_infreq"
+```{r}
+table(fct_infreq(elo$team1))
+
+```
+
+
+Because this dataset covers years all the way back to 1947, we have a lot of teams that only have a small amount of games. One way we can shorten the list is with "fct_lump".  We have three choices concerning which values will get  "lumped" together: specify "n", "prop", or neither. First we'll try it with both "n" and "prop" left blank.  
+
+```{r}
+
+table(fct_infreq(fct_lump(elo$team1)))
+```
+As you can see, all it did was change "SDS" to "Other". That's because if you don't specify "n" or "prop", the function will combine as many as possible while making sure that the "other" category is still the smallest.  Because adding "TRH" would have made the "Other" category larget than "PIT", it stopped there.
+
+Instead of this, let's just grab the top 10 by specifying "n".
+
+```{r}
+
+table(fct_infreq(fct_lump(elo$team1, n = 10)))
+
+```
+
+As you can see, we have 11 factors now.  The 10 most frequent, and then another factor that combines the rest.  Since we're still using "fct_infreq" to sort, the "Other" factor ends up at the top of the list.  
+The third option is to specify a minimum percentage of the total that this factor makes up.  Let's grab any where there are mosre than 5% of the total.
+
+```{r}
+
+table(fct_infreq(fct_lump(elo$team1, prop = 0.05)))
+
+```
+And here we ended up with everything grouped together.  Because our factors are fairly evenly spread, we don't have any that amount for 5% or more of the games.  Let's try 0.5%
+
+```{r}
+
+table(fct_infreq(fct_lump(elo$team1, prop = 0.005)))
+```
+
+Let's say we want to reorder the factors manually. Let's say say we are a west coast person. Let's take the list from above but move the California teams to the beginning of the list.
+```{r}
+relevel = fct_infreq(fct_lump(elo$team1, prop = 0.005))
+relevel = fct_relevel(relevel,c("LAL","LAC"))
+table(relevel)
+
+```
+
+Ah, but we missed Golden State.  Lets move that to the third level using the "after" option.  
+
+```{r}
+relevel = fct_relevel(relevel,c("GSW"), after = 2)
+table(relevel)
+
+```
+
+"Other" Now looks a little weird, let's put that at the end.  We can just set the "after" to "Inf".
+```{r}
+relevel = fct_relevel(relevel, "Other", after = Inf)
+table(relevel)
+```
+
+This should give you some basic idea of how to use the forcats functionality for displaying your factors.  There are more options that you can use, and this package really shines when used in conjunction with ggplot2 for making plots.
+
+
+
+
