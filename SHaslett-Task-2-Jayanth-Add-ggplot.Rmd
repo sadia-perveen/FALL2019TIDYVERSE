@@ -1,0 +1,96 @@
+---
+title: "Tidyverse_assignment_Task1"
+author: "Jayanth0572"
+date: "November 25, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+In this task dataset "breweries_us.csv" was downloaded from "https://www.kaggle.com/brkurzawa/us-breweries/data#".</br>
+This CSV file was imported into R and few transacformations were performed using packages from Tidyverse.</br>
+Below packages from Tidyverse was used...
+
+- readr
+- stringr
+- magrittr
+
+
+# Code
+### Read dataset into R
+using readr package
+```{r}
+
+library(readr)
+
+# Source file "breweries_us.csv" was downloaded from "https://www.kaggle.com/brkurzawa/us-breweries/data#"
+
+# Read data from csv file "breweries_us.csv" into a tibble
+# "read_csv" function from "readr" package was sed
+input <- read.csv("breweries_us.csv", stringsAsFactors = F)
+
+head(input)
+
+
+```
+
+
+### Refromat the tibble
+using stringr, dplyr, magrittr package
+```{r}
+
+library(magrittr)
+library(stringr)
+library(dplyr)
+
+# pipe operators were used to simplify the transformation steps
+# str_extract functoin was used to select strings based on regular expressions
+# select function was used to pick the required columns for new dataframe
+
+reformatted_df <- input %>%
+  mutate(street = str_extract(address, "(\\b([[:alnum:]]+\\s+[[:alnum:]]+\\.*)[^,]+)"),
+                 zip = str_extract(address, "[[:digit:]]+$")
+               ) %>%
+  select("brewery_name", "type", "website", "street", "state", "zip", "state_breweries")
+
+  head(reformatted_df)
+
+```
+
+
+### Performing some analysis
+using dplyr, magrittr package
+```{r}
+
+library(magrittr)
+library(dplyr)
+
+# counting brewery types
+# group_by and tally functoins were used to count the brewery types
+# arrange function was used to get clear idea of popular brewry type
+
+count_by_type <- reformatted_df %>%
+  group_by(type) %>%
+  tally(name = "typecount") %>%
+  arrange(.,desc(typecount))
+
+count_by_type
+
+```
+
+### ggplot functionality added by Stephen Haslett as per Task 2 of the assignment - "Extend an Existing Example".
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+brewery_type_plot <- ggplot(count_by_type, aes(x = reorder(type, - typecount), y = typecount)) +
+    geom_bar(stat = "identity", fill = '#f28e1c') +
+    labs(title = "Brewery Count by Type",
+         x = "Brewery Type",
+         y = "Count") +
+    theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+    theme(panel.background = element_rect(fill = '#FFFFFF'))
+
+brewery_type_plot
+```
