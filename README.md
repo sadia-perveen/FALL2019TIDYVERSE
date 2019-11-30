@@ -28,6 +28,19 @@ You should complete both parts of the assignment and make your submission no lat
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
 ## Vignettes
+
+### Ramen Ratings
+Author: Stephen Haslett
+
+**GitHub Repository**: https://github.com/stephen-haslett/FALL2019TIDYVERSE
+
+**Data Source**: https://www.kaggle.com/residentmario/ramen-ratings/data
+
+**RPubs Location**: http://rpubs.com/stephenhaslett/554575
+
+**Task 1**: SHaslett-607-Tidyverse-assignment.Rmd. For task 1, I imported the ramen-ratings dataset from Kaggle (https://www.kaggle.com/residentmario/ramen-ratings/data)
+into R using the "readr" package. I then demonstrated the dplyr package's "slice", "filter", and "select" functions.
+
 ### Create a Document Term Matrix
 Author: Jai Jeffryes
 
@@ -56,17 +69,3 @@ Source: https://github.com/lincarrieli/FALL2019TIDYVERSE
 Updater: Euclid Zhang
 Date Completed: 11/17/2019
 Action: Update with a few examples from TidyVerse package.
-
-### Ramen Ratings
-Author: Stephen Haslett
-
-**GitHub Repository**: https://github.com/stephen-haslett/FALL2019TIDYVERSE
-
-**Data Source**: https://www.kaggle.com/residentmario/ramen-ratings/data
-
-**RPubs Location**: http://rpubs.com/stephenhaslett/554575
-
-**Task 1**: SHaslett-607-Tidyverse-assignment.Rmd. For task 1, I imported the ramen-ratings dataset from Kaggle (https://www.kaggle.com/residentmario/ramen-ratings/data)
-into R using the "readr" package. I then demonstrated the dplyr package's "slice", "filter", and "select" functions.
-
-**Task2**: SHaslett-Task-2-Jayanth-Add-ggplot.Rmd. For task 2, I added a ggplot Bar Plot to Jayanth0572's US Breweries assignment - https://github.com/jayanth0572/FALL2019TIDYVERSE.
