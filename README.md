@@ -27,6 +27,20 @@ You should complete both parts of the assignment and make your submission no lat
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
+## Vignettes
+### Create a Document Term Matrix
+Author: Jai Jeffryes
+
+A document term matrix (DTM) is a data structure that can serve as the input to machine learning models. Tidyverse tools can create this structure.
+
+cf. `candidate_email_dtm.Rmd`
+
+### Trump Approval Ratings from FiveThirtyEight
+Author: Donny Lofland
+
+FiveThirtyEight has aggregated polling data from a number of sources tracking Trump's approval rating since January 2017.  In this programming vignette, we will use TidyVerse packages to load, manipulate, summarize and plot Trump's approval rating over time. 
+
+cf. `trump_approval_ratings.Rmd`
 
 TidyVerse Assignment: 
 
@@ -35,7 +49,6 @@ Editor: Euclid Zhang
 Date Completed: 11/11/2019
 Action: Create a demonstration of how to use the functions in the purrr package.
 Rpubs: http://rpubs.com/ezaccountz/TidyVerse_Assignment_EZ
-
 
 Part 2:
 Creator: Lin Li
