@@ -42,3 +42,28 @@ filter(weather2, year == "2014")
 ggplot(weather2, aes(actual_mean_temp)) + geom_bar()
 ```
 
+```{r}
+weather3 <- weather2 %>%
+ group_by(month) %>%
+ summarise(avg = round(mean(actual_mean_temp), 1)) %>%
+ arrange(as.numeric(month))
+weather3$month <- as.character(weather3$month)
+weather3$month[weather3$month == "1"] <- "January"
+weather3$month[weather3$month == "2"] <- "February"
+weather3$month[weather3$month == "3"] <- "March"
+weather3$month[weather3$month == "4"] <- "April"
+weather3$month[weather3$month == "5"] <- "May"
+weather3$month[weather3$month == "6"] <- "June"
+weather3$month[weather3$month == "7"] <- "July"
+weather3$month[weather3$month == "8"] <- "August"
+weather3$month[weather3$month == "9"] <- "September"
+weather3$month[weather3$month == "10"] <- "October"
+weather3$month[weather3$month == "11"] <- "November"
+weather3$month[weather3$month == "12"] <- "December"
+```
+
+```{r}
+library(ggplot2)
+a <- ggplot(weather3, aes(month,avg))
+a + geom_bar(stat = "identity") + scale_x_discrete(limits=weather3$month)
+```
