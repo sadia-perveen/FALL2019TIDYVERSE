@@ -222,3 +222,100 @@ weather5 <- weather4 %>% top_n(actual_mean_temp, n= 5)
 (weather5)
 ```
 
+--------------------------------------------------------------------------------
+
+\clearpage
+
+# Part II:  Extending Sufian Suwarman's code and vignette by Sie Siong Wong
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+
+## Load data
+
+```{r, eval=TRUE}
+
+# Read data.
+polls <- read.csv("https://raw.githubusercontent.com/ssufian/Data_607/master/approval_topline.csv", header=TRUE,stringsAsFactors = FALSE)
+
+polls2 <- read.csv('https://raw.githubusercontent.com/ssufian/Data_607/master/polling_data.csv', header=TRUE, stringsAsFactors = FALSE)
+
+```
+
+## Extending Sufian's Code
+
+### Trump's Approval Change Over Time
+
+- It will be interesting to see how Trump's approval change over the time by using the dplyr packages functions such as group_by and summarize and then plot the trend.
+
+```{r, eval=TRUE}
+
+# Approval rates.
+average.approve <- polls2 %>% 
+  select(enddate, adjusted_approve) %>%
+  group_by(enddate) %>% 
+  summarise(average_approve = mean(adjusted_approve))
+  
+# Disapproval rates.
+average.disapprove <- polls2 %>% 
+  select(enddate, adjusted_disapprove) %>%
+  group_by(enddate) %>% 
+  summarise(average_disapprove = mean(adjusted_disapprove))
+
+# Merge two dataframe together.
+average.final <- merge(average.approve,average.disapprove)
+average.final$enddate <- anytime::anydate(average.final$enddate)
+
+# We can plot the approval and disapproval ratings together.
+ggplot(average.final, aes(x=enddate)) +
+  ggtitle("Approval & Disapproval") + ylab("%") + 
+  geom_smooth(aes(y=average_approve, group=1, colour="Approval")) + geom_smooth(aes(y=average_disapprove, group=2, colour="Disapproval")) + 
+  theme(plot.title = element_text(hjust=0.5), axis.title.x=element_blank(), axis.text.x=element_text(angle=180,hjust=1),legend.position=c(0.6,0.9),legend.title=element_blank())
+
+```
+
+- From the chart, we can see that president Trump's approval rate has been declined sharply since he took office in January 2017. But his approval rate started to increase again in Fall 2017 and become quite steady around 43% from March 2018 forward but starts to trend down recently. It is quite interesting to see the disapproval rate is exactly the opposite side of approval rate. Not sure if the data
+
+### Compare Estimate Approval Rate
+
+```{r, eval=TRUE}
+
+# Estimate approval rate.
+average.approve.estimate <- polls %>% 
+  select(modeldate, approve_estimate) %>%
+  group_by(modeldate) %>% 
+  summarise(average_approve_estimate = mean(approve_estimate))
+
+average.approve.estimate$modeldate <- anytime::anydate(average.approve.estimate$modeldate)
+
+# Plot to compare estimate and survey approval rate.
+ggplot(NULL) +
+  ggtitle("Estimate vs Survey Approval Rate") + 
+  ylab("%") + 
+  geom_smooth(data=average.final, aes(x=enddate, y=average_approve, group=1, colour="Actual Approval")) +
+  geom_smooth(data=average.approve.estimate, aes(x=modeldate, y=average_approve_estimate, group=2, colour="Estiamte Approval")) + 
+  theme(plot.title = element_text(hjust=0.5), axis.title.x=element_blank(), axis.text.x=element_text(angle=180,hjust=1),legend.position=c(0.6,0.9),legend.title=element_blank())
+
+```
+
+- From the chart, we can see the estimate approval rate is fairly close to the actual approval rate.
+
+
+### Subgroup Approval Rate Variation
+
+- It will also be interesting to see the variation of approval rate from each subgroup..
+
+```{r, eval=TRUE}
+
+# Approval rate.
+subgroup.approve <- polls2 %>% 
+  select(subgroup, adjusted_approve) %>% group_by(subgroup)
+
+# Boxplot for each subgroup.
+ggplot(subgroup.approve, aes(x=reorder(factor(subgroup), adjusted_approve, fun=median),y=adjusted_approve,fill=factor(subgroup))) + geom_boxplot() + labs(title="Subgroup Approval Rate Variation") + ylab("%") + theme(legend.position = "none", axis.title.x = element_blank(), axis.text.x=element_text(angle=45)) + theme(plot.title = element_text(hjust=0.5)) + theme(axis.text.x = element_text(margin = margin(t = 25, r = 20, b = 0, l = 0)))
+
+```
+
+- From the boxplot, we can see the variation about the same across the 3 groups.
