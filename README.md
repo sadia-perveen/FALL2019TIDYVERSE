@@ -69,3 +69,15 @@ Source: https://github.com/lincarrieli/FALL2019TIDYVERSE
 Updater: Euclid Zhang
 Date Completed: 11/17/2019
 Action: Update with a few examples from TidyVerse package.
+
+### Forcats Vignette
+Author:Steven Ellingson
+
+Part 1: Use forcats to easily change the way the levels of your factors are displayed in tables and plots.
+
+cf. `forcats vignette.Rmd`
+
+Part 2: Added some forcats and ggplot2 functions to C Rosemund's soccer data.
+
+cf. `steven_ellingson_tidyverse_part_2.Rmd`
+=======
