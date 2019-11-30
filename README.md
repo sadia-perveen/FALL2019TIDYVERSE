@@ -57,7 +57,6 @@ Updater: Euclid Zhang
 Date Completed: 11/17/2019
 Action: Update with a few examples from TidyVerse package.
 
-
 ### Ramen Ratings
 Author: Stephen Haslett
 
