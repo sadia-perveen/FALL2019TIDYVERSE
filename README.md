@@ -26,3 +26,9 @@ You should complete both parts of the assignment and make your submission no lat
 * GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
+
+# Projects
+
+|Name|Source|Data Set|
+|----|------|--------|
+|Avraham Adler|Kaggle|Boston Crimes|
