@@ -124,7 +124,7 @@ head(res)
 The most recent version of `tidyr` uses a new set of verbs. Specifically,
 instead of `gather` and `spread`, there is `pivot_longer` and `pivot_wider`.
 It is more sensitive than the older version, and won't allow pivoting different
-variable types to longer. TYhe older version used to cast everything to the most
+variable types to longer. The older version used to cast everything to the most
 general type, which in this case would be character. So we well compare
 distributing the `president` and `subgroup` variable over `modeldate`.
 
