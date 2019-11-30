@@ -80,3 +80,4 @@ cf. `forcats vignette.Rmd`
 Part 2: Added some forcats and ggplot2 functions to C Rosemund's soccer data.
 
 cf. `steven_ellingson_tidyverse_part_2.Rmd`
+=======

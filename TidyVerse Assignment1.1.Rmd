@@ -1,0 +1,44 @@
+---
+title: "DATA607_TidyVerse_assignment1"
+author: "Lin Li"
+date: "9/1/2019"
+output: html_document
+---
+
+Create an Example.  Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. 
+
+1. Get dataset from 538.
+
+```{r}
+weather <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/us-weather-history/KCLT.csv")
+weather
+
+```
+
+2. tidyr separate function:
+```{r}
+library(tidyr)
+weather2 <- weather %>% separate(date, c("year", "month", "day"), sep = "-")
+weather2
+```
+
+3. dplyr select function:
+
+```{r}
+library(dplyr)
+select(weather2, year, actual_mean_temp, record_min_temp, record_max_temp, record_precipitation)
+```
+
+4. dplyr filter (subsetting dataset)
+
+```{r}
+library(dplyr)
+filter(weather2, year == "2014")
+```
+
+5. ggplot histogram for actual_mean_temp
+
+```{r}
+ggplot(weather2, aes(actual_mean_temp)) + geom_bar()
+```
+
