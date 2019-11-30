@@ -1,0 +1,148 @@
+---
+title: "Fall 2019---Data 607---Tidyverse Assignment"
+subtitle: "Task 1: Kaggle---Boston Crimes & Tidyverse"
+author: "Avraham Adler"
+date: "9/2/2019"
+output:
+  pdf_document:
+    extra_dependencies:
+      amsmath: null
+      inputenc: utf8
+    toc: true
+    toc_depth: 2
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Introduction
+I exclusively use the Windows operating system, and may make mention of software for that ecosystem. There should be similar alternates for Mac or Linux.
+
+# Tidyverse Assignment Instructions
+You have two tasks:
+
+  1. Create an Example.  Using one or more Tidyverse packages, and any data set from [fivethirtyeight.com](https://data.fivethirtyeight.com/) or [Kaggle](https://www.kaggle.com/datasets), create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected Tidyverse package with your selected data set. (25 points)
+  1. Extend an Existing Example.  Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+
+# Tidyverse packages
+The Tidyverse packages demonstrated in this vignette will be `readr`, `dplyr`, and `ggplot2`.
+
+# Data set
+The data set that I will be using is Kaggle's [Crimes in Boston](https://www.kaggle.com/AnalyzeBoston/crimes-in-boston). For simplification purposes, and because Kaggle requires a login which I do not wish to expose, I have already downloaded the ZIP file and extracted it to a local folder.
+
+## Context & Content
+> Crime incident reports are provided by Boston Police Department (BPD) to document the initial details surrounding an incident to which BPD officers respond. This is a data set containing records from the new crime incident report system, which includes a reduced set of fields focused on capturing the type of incident as well as when and where it occurred. Records begin in June 14, 2015 and continue to September 3, 2018.
+
+Quoted from Kaggle's description.
+
+# Preliminary Exploration
+## Loading the files into R
+The `readr` package is the tidyverse upgrade for base R's `read.XXXX` commands. It uses underscores instead of dots to separate the verb from the type of file. As the Kaggle files are CSVs, we will use the `read_csv` command. This also creates a tibble and not a data.frame, in line with the tidyverse mentality.
+```{r loadPackages, include=FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+```
+
+Let's start with the code file.
+```{r readCodes}
+Codes <- read_csv('./offense_codes.csv')
+```
+
+Note that `read_csv` makes intelligent assumptions about the variable classes of the columns. Now let's try the crimes file.
+```{r readCrimes}
+Crimes <- read_csv('./crime.csv')
+```
+
+Not as simple. What this demonstrates that it often pays to look at the structure of the file before importing it blindly. First, the Kaggle page itself suggests variable types for the fields. One can also manually investigate the files. When dealing with text files (.csv, .txt, .log usually, etc.), if they are small, then software such as Notepad, [Notepad++](https://notepad-plus-plus.org/), or even Microsoft Excel is useful. When the number of rows is measured in the millions or greater, my suggestion is to use [glogg](https://glogg.bonnefon.org/). Let's try importing the file with specific classes for the columns based on the suggestions at the Kaggle page and some other specific arguments.
+```{r readFiles2}
+Codes <- read_csv('./offense_codes.csv', col_types = "ic")
+Crimes <- read_csv('./crime.csv', col_types = "cicccccTiiciccddc",
+                   locale = locale(encoding = "latin1"))
+```
+
+Note now there are no failure messages. This does expose one class of "problems" with the tidyverse: function arguments do not follow base R. In base R, for example, the argument to pass a vector of variable types is called `colClasses`. The `data.table` package retained this name, but `readr` calls it `col_types`. For people whose entry into the R ecosystem is the tidyverse and who will remain there, that isn't a big deal. For more experienced (read older) users or those who need to branch outside the tidyverse, it pays to remember and always make certain you know what the proper argument names are.
+
+Also note the passed `locale` argument. Trial and error showed an issue with the import having to do with the assumed locale vs. the file encoding. This solved the issue. One more element of which a data scientist needs to be aware.
+
+## Data Content
+Let's get an idea of what this data set contains. The `glimpse` command is the tidyverse equivalent of `str`. While `str` returns the expected for a data frame or a data table, for a tibble, the columnar attribute metadata is stored differently and will be appended to the output (try it), so the equivalent tidyverse command is `glimpse`.
+```{r glimpseFiles}
+glimpse(Codes)
+glimpse(Crimes)
+```
+
+What we see is that the Codes file contains more specific data about the crimes committed in the crimes file, and the foreign key is the Offence Code.
+
+# `dplyr` usage[^1]
+## Joins
+First, let's use `dplyr` verbs to join the two data sets. Then we'll extract a subset of the Crimes using `dplyr` verbs. We will look at the distribution of crimes by day of the week and hour of the day.
+
+[^1]: Despite my personal aversion to `magrittr`-style piping, as that is the *lingua franca* of the tidyverse, it will be used.
+```{r dplyrJoin}
+CrimesAugmented <- Crimes %>% inner_join(Codes, by = c("OFFENSE_CODE" = "CODE"))
+CrimesAugmented
+```
+
+Since the full table is too wide to display in this vignette, let's look at the first few rows and the offense description, remembering that the joined column is called `NAME`.
+```{r CAsmall}
+CrimesAugmented[1:5, c(1, 4, 18)]
+```
+
+## Selecting
+As our interest lies in the distribution of crimes by day of week and time of day, we should focus on those fields. The `dplyr` verb for extracting columns is `select`.
+```{r selectColumns}
+CAsubset <- CrimesAugmented %>% select(c("INCIDENT_NUMBER", "OFFENSE_CODE", "OFFENSE_CODE_GROUP",
+                                         "OCCURRED_ON_DATE", "DAY_OF_WEEK", "HOUR"))
+CAsubset
+```
+
+## Grouping and Arrannging
+Let's count the number of crimes that occurred on each day of the week, and see if there is any correlation or if the distribution is uniform. To do this, we will use `dplyr`'s grouping commands, which is conveniently `group_by`. We will also use the `summarize` verb which allows access to a group of functions that can be performed over `select`ed columns, `filter`ed rows, and `group_by` groups.
+```{r group}
+CAsubset %>% group_by(DAY_OF_WEEK) %>% summarize(Count = n()) %>% arrange(-Count)
+```
+
+Yes, it seems that Friday has increased crime and Saturday/Sunday have reduced crime. Note that after we grouped by day, we passed the resulting two-column tibble to the `arrange` verb which reorders the rows. Here we asked for them to be ordered by Count in descending order. Let's look at this graphically.
+```{r DoWHist}
+ggplot(CAsubset %>% group_by(DAY_OF_WEEK) %>% summarize(Count = n())) +
+  geom_point(aes(x = DAY_OF_WEEK, y = Count))
+```
+
+Notice how the days are plotted---alphabetically and not in order. Let's correct that, and start the week on Monday so that the weekend-effect is clear. This time, we will save the days of the week count into its own object so we can further manipulate it.
+
+## Mutate
+```{r DoW2}
+CA_DoW <- CAsubset %>% group_by(DAY_OF_WEEK) %>% summarize(Count = n()) %>% 
+  mutate(DAY_OF_WEEK, DAY_OF_WEEK = factor(DAY_OF_WEEK,
+                                           levels = c("Monday", "Tuesday", "Wednesday",
+                                                      "Thursday", "Friday", "Saturday", "Sunday")))
+
+ggplot(CA_DoW) + geom_point(aes(x = DAY_OF_WEEK, y = Count))
+```
+
+Much better! We used the `mutate` verb to create a new column based on `DAY_OF_WEEK` which is a factor with defined levels and not a vector of characters. In the interest of parsimony, we named the new column the same as the old one, which overwrite it.
+
+## Filtering
+The last major `dplyr` verb we need to cover is `filter`. This filters for **rows** or observations which pass certain criteria, as opposed to `select` which takes all the observations of specific fields. Of course they can be combined. For this example, let's look at the distribution of crimes by hour for specifically for Friday.
+```{r filterFriday}
+CAsubset %>% filter(DAY_OF_WEEK == "Friday") %>% group_by(HOUR) %>% summarize(Count = n())
+```
+
+It seems to be safest on a Bostonian Friday night during the hours of 3AM--6AM (since crimes reported up to 5:59 will be in the 5 hour).
+
+## Having fun
+To wrap up, let's compare the crimes by hour by day of week. We will use `ggplot`'s faceting capabilities here. Also, we will use the same verbs as above, but some of them have changed their position in the call. Can you figure out why?
+```{r WeekCompare}
+CA_DoW_H <- CAsubset %>% 
+  mutate(DAY_OF_WEEK, DAY_OF_WEEK = factor(DAY_OF_WEEK,
+                                           levels = c("Monday", "Tuesday", "Wednesday",
+                                                      "Thursday", "Friday", "Saturday",
+                                                      "Sunday"))) %>% 
+  group_by(DAY_OF_WEEK, HOUR) %>% summarize(Count = n())
+ggplot(CA_DoW_H, aes(x = HOUR, y = Count)) + geom_path() + facet_wrap(~DAY_OF_WEEK)
+```

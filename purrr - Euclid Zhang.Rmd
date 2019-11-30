@@ -1,0 +1,223 @@
+---
+title: "TidyVerse Assignment"
+author: "Euclid Zhang"
+date: "11/11/2019"
+output: html_document
+---
+
+The purrr package is a convenient tool for manipulating lists with functions.
+This assignment is a demonstration of how to use the functions in the purrr package.
+
+Load the purrr library and the dplyr library as an assistant. We will use the college_all_ages data set from the fivethirtyeight package.
+```{r}
+library(purrr)
+library(fivethirtyeight)
+```
+
+First, let look at the first few rows of the college_all_ages data set
+```{r}
+head(college_all_ages)
+```
+
+Extract the unemployment_rate column as a list
+```{r}
+major_unemp <- college_all_ages$unemployment_rate
+```
+
+The set_names function is used to assign a name to each of the element in a list.  
+In this example, I assign the names by their corresponding majors
+```{r}
+major_unemp <- set_names(major_unemp,college_all_ages$major)
+head(major_unemp)
+```
+  
+  
+  
+  
+
+Section 1 - select particular elements from a list:  
+1.pluck() ---- select an element by name or index.  
+For example: We can select the first element by
+```{r}
+pluck(major_unemp, "General Agriculture")
+# or
+pluck(major_unemp, 1)
+```
+
+2.keep() ---- select all elements that pass a logicl test.  
+For example: We can select all elements whose value is greater than 0.05
+```{r}
+res <- keep(major_unemp, function(x) x > 0.05)
+head(res)
+```
+
+3.discard() ---- select all elements that DO NOT pass a logicl test.  
+For example: We can select all elements whose value is NOT greater than 0.05
+```{r}
+res <- discard(major_unemp, function(x) x > 0.05)
+head(res)
+```
+
+4.head_while() ---- select all elements from the beginning of a list up to and exclude the element that does not pass a logical test.  
+For example: we can select all elements whose value is greater than 0.02 from the beginning of a list
+```{r}
+res <- head_while(major_unemp, function(x) x > 0.02)
+head(res)
+```
+
+5.tail_while() ---- select all elements from the end of a list up to and exclude the element that does not pass a logical test.  
+For example: we can select all elements whose value is greater than 0.05 from the end of a list
+```{r}
+res <- tail_while(major_unemp, function(x) x > 0.05)
+head(res)
+```
+  
+    
+  
+  
+  
+Section 2 - logical operations:  
+1.every() ---- Check if all elements in a list pass a logical test  
+For example: we can check if all elements are greater than 0
+```{r}
+every(major_unemp,function(x) x > 0)
+```
+
+2.some() ---- Check if some elements in a list pass a logical test  
+For example: we can check if some elements are 0
+```{r}
+some(major_unemp,function(x) x == 0)
+```
+
+3.some() ---- Check if a value is an element of a list  
+For example: we can check if 0 is in the list or not
+```{r}
+has_element(major_unemp,0)
+```
+
+4.detect() ---- Find the first element that passes a logical test  
+For example: we can find the first element that is greater than 0.08
+```{r}
+detect(major_unemp,function(x) x > 0.08)
+```
+
+5.detect_index() ---- Find the index of the first element that passes a logical test  
+For example: we can find index of the first element that is greater than 0.08
+```{r}
+detect_index(major_unemp,function(x) x > 0.08)
+```
+  
+    
+  
+  
+  
+Section 3 - applying function conditionally:  
+1.modify() ---- Apply a function to each of the elements in a list  
+For example: multiply all values in the list by 100
+```{r}
+res <- modify(major_unemp, function(x) x * 100)
+head(res)
+```
+
+2.modify_at() ---- Apply a function to an element by name or index  
+For exmaple: multiply the first element by 100
+```{r}
+res <- modify_at(major_unemp,1, function(x) x * 100)
+head(res)
+```
+
+3.modify_if() ---- Apply a function to elements that pass a logical test    
+For exmaple: multiply the elements that are greater than 0.05 by 100
+```{r}
+res <- modify_if(major_unemp, function(x) x > 0.05, function(x) x *100)
+tail(res)
+```
+  
+    
+  
+  
+  
+Section 4 - lists combine:  
+1.append() ---- Append another list to the end of a list  
+For example: Append the 3rd and 4th elements to the 1st and 2nd elements as a list
+```{r}
+append(major_unemp[1:2], major_unemp[3:4])
+
+```
+
+2.prepend() ---- Add another list to the beginning of a list    
+For example: Add the 3rd and 4th elements to the beginning of the 1st and 2nd elements as a list
+```{r}
+prepend(major_unemp[1:2], major_unemp[3:4])
+```
+
+3.splice(): combine all lists and other elements into a list  
+For example: Combine the 1st and 2nd elements as a list, the 3rd and 4th elements as a list and a new element "0.123" into one list
+```{r}
+splice(major_unemp[1:2], major_unemp[3:4], "new value" = "0.123")
+```
+
+    
+  
+  
+  
+Other functions:
+  
+cross2() ---- Using elements from 2 lists, create a list of all possible combinations with 1 element for the first list and another element from the second list  
+For example: create all combinations by using the first 2 values from the major column and the first 2 values from the unemployment rate column
+```{r}
+cross2(college_all_ages$major[1:2],college_all_ages$unemployment_rate[1:2])
+```
+
+array_tree() ---- Turn an array into a list
+```{r}
+class(major_unemp)
+res <- array_tree(major_unemp)
+class(res)
+```
+
+
+map2() ---- apply a function to each pair of elements from 2 lists and return the results as a list  
+For example: we combine 1 element from the major_category list and a corresponding element from the unemployment_rate list into a list. The result will be a list of 2-element lists.
+```{r}
+major_unemp_cate <- map2(college_all_ages$major_category, college_all_ages$unemployment_rate, function(x,y) list(x,y))
+major_unemp_cate <- set_names(major_unemp_cate,college_all_ages$major)
+head(major_unemp_cate)
+```
+
+invoke_map() ---- given a list of functions and a list of elements of the same length, apply each of the function to a corresponding element. 
+For example: we can multiply the first element by 100 and multiply the second element by -1
+```{r}
+res <- invoke_map(list(function(x) x * 100, function(y) y * -1), major_unemp[1:2])
+head(res)
+```
+
+
+flatten() ---- remove a level of indexes from a list  
+For example, we can flatten the just created list of 2-element lists into a single list
+```{r}
+length(major_unemp_cate)
+res <-flatten(major_unemp_cate)
+length(res)
+```
+
+transpose() ---- Transposes the index order in a multi-level list  
+For example, we can Transposes just created the list of 2-element lists 
+```{r}
+length(major_unemp_cate)
+res <- transpose(major_unemp_cate)
+length(res)
+```
+
+reduce() ---- apply a functin recursively to each element of a list  
+For example: we can add up all elements in a list recursively
+```{r}
+reduce(major_unemp, sum)
+```
+
+accumulate() ---- the same as reduce(), but also return all intermediate results as a list  
+```{r}
+res <- accumulate(major_unemp, sum)
+tail(res)
+```
+
