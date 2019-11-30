@@ -120,6 +120,20 @@ res <- res %>%
 head(res)
 ```
 
+### tidyr 1.0
+The most recent version of `tidyr` uses a new set of verbs. Specifically,
+instead of `gather` and `spread`, there is `pivot_longer` and `pivot_wider`.
+It is more sensitive than the older version, and won't allow pivoting different
+variable types to longer. TYhe older version used to cast everything to the most
+general type, which in this case would be character. So we well compare
+distributing the `president` and `subgroup` variable over `modeldate`.
+
+```{r pivot}
+res1 <- res %>% select(president, subgroup, modeldate) %>% gather('type', 'value', -modeldate)
+res2 <- %>% select(president, subgroup, modeldate) %>% pivot_longer(cols = -modeldate, names_to = "type", values_to = "value")
+all.equal(res1, res2)
+```
+
 ## ggplot2
 
 Let's see how Trump's approval and disapproval ratings have varied over time.  We also plot the gap, calculated as approval minus disapproval.  We see that very early into his term, Trump's disapproval rating exceeded his approval rating and he has maintained a negative gap throughout his presidency.  
