@@ -42,4 +42,18 @@ Avengers_2012
 
 For my Tidyverse example I used the Avengers dataset from FiveThirtyEight. The dataset contains a list of members of the Avengers group from the Marvel comics. The list shows appearances of when they were first introduced in the comics and if/when they died and/or returned. I used the filter function from the dplyr package to extract every avenger from the 2012 Avengers film. I then put them into a list and used the full_join function from the dplyr function to put every avenger that I got from using the filter function into one data frame.
 
-**Extend an Existing Example**  Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+**Extend an Existing Example**
+
+I extended Stephen Haslett's code as seen below. 
+
+# This is what Bryan Persaud is adding to Stephen Haslett's code
+
+```{r}
+ggplot(ramen_top_ten, aes(x = Brand, y = Stars)) + geom_bar(stat = "identity") + labs(title = "Top Ten Listings by Stars", x = "Brand", y = "Stars") + theme(axis.text.x = element_text(angle = 75, size = 14, hjust = 1), axis.text.y = element_text(size = 10))
+```
+
+```{r}
+ggplot(five_stars, aes(x = Brand, y = Country)) + geom_bar(stat = "identity") + labs(title = "Five Star Ramens by Country", x = "Brand", y = "Country") + theme(axis.text.x = element_text(angle = 75, size = 14, hjust = 1), axis.text.y = element_text(size = 10))
+```
+
+I chose to use ggplot2 package to plot a graph to show the ramens that got a top ten listings from the ramen_top_ten dataframe created. I also used ggplot2 to show the ramens that got a five star rating from the five_stars dataframe.
