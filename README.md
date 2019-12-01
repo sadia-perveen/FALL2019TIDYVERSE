@@ -28,6 +28,14 @@ You should complete both parts of the assignment and make your submission no lat
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
+**TidyVerse Vignette Assignment -- Zach Alexander**
+
+* Part 1: I will be making a TidyVerse vignette for the tidyr package, using the NFL elo ratings dataset from FiveThirtyEight.
+  * You can find this here: http://rpubs.com/zachalexander/tidyverse
+
+* Part 2: I extended the Euclid Zhang's example, adding to his great plots by creating a ggplot2 plot of my own, as well as utilizing some tidyr and dplyr functions to manipulate the weather data he provided.
+  * You can find this here: 
+  
 ## Vignettes
 
 ### Ramen Ratings
@@ -91,5 +99,3 @@ Avengers dataset: https://github.com/fivethirtyeight/data/tree/master/avengers
 **Extend an Existing Example**
 
 I extended Stephen Haslett's code.
-
-=======
