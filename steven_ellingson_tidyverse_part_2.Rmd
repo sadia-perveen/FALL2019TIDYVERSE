@@ -1,0 +1,133 @@
+---
+title: "Tidyverse Part 1"
+author: "C. Rosemond"
+date: "November 2, 2019"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Library
+
+```{r library, message=FALSE}
+library(tidyverse)
+```
+
+## Data Set(s)
+I selected two fivethirtyeight data sets: one that contains current Soccer Power Index (SPI) ratings and rankings for men's club teams and a second that contains match-by-match SPI ratings and forecasts back to 2016.
+
+URL: https://github.com/fivethirtyeight/data/tree/master/soccer-spi
+
+## readr - read_csv()
+The readr package facilitates the reading in of 'rectangular' data like .csv files or other delimited files. Here, I use the read_csv() function to read in two data sets: the global rankings, or 'rankings', and the matches, or 'matches'.
+
+```{r read_csv1, eval=TRUE, message=FALSE}
+rankings <- read_csv('https://projects.fivethirtyeight.com/soccer-api/club/spi_global_rankings.csv')
+matches <- read_csv('https://projects.fivethirtyeight.com/soccer-api/club/spi_matches.csv')
+head(rankings)
+tail(matches)
+```
+
+
+## dplyr - mutate()
+The dplyr package provides a grammar for the manipulation of data--notably, in data frames or tibbles. Here, I use the mutate function to add a new column--a match ID--to the matches tibble.
+
+```{r mutate, eval=TRUE}
+matches <- mutate(matches, match = row_number())
+matches <- matches[,c(23,1:22)]
+head(matches)
+```
+
+
+## dplyr - select()
+The select function from dplyr enables the selection of data frame columns by name or helper function. Here, I select and keep the first six columns ('match' through 'team2') from the matches tibble.
+
+```{r select, eval=TRUE}
+matches <- select(matches, match:team2)
+head(matches)
+```
+
+
+## dplyr - filter()
+The filter function from dplyr enables the subsetting of rows based on specified logical criteria. Here, I select matches that occurred from November 1st through November 7th.
+
+```{r filter, eval=TRUE}
+matches <- filter(matches, date >= '2019-11-01' & date <= '2019-11-07')
+head(matches)
+```
+
+
+## tidyr - gather()
+The tidyr package is designed to facilitate reshaping data. Here, I use the gather() function to reshape the matches tibble from wide to long format, gathering the separate team columns.
+
+```{r gather, eval=TRUE}
+matches <- matches %>% gather(-match, -date, -league_id, -league, key=team_number, value=name) %>% select(-team_number)
+head(matches)
+```
+
+
+## dplyr - arrange()
+The arrange function from dplyr enables the sorting of data based upon column values. Here, I arrange the matches tibble by match number.
+
+```{r arrange, eval=TRUE}
+matches <- arrange(matches, match)
+head(matches)
+```
+
+
+## dplyr - left_join()
+The left_join function works similarly to its SQL counterparts. I finish by using 'name' to merge the matches tibble with the rankings tibble, which contains club rankings and ratings as of November 7th.
+
+```{r left_join, eval=TRUE}
+merged <- dplyr::left_join(matches, rankings, by='name')
+merged <- select(merged, -league.y, - off, -def)
+head(merged)
+```
+## dplyr - rename()
+We can use the rename function to clean up the 'league.x' column name
+```{r}
+merged <- rename(merged, 'league_name' = 'league.x')
+head(merged)
+```
+
+## forcats - as_factor()
+
+We can use forcats to take a look at the "league_name" field.  We first need to convert to a factor.
+
+```{r}
+merged$league_name = as_factor(merged$league_name)
+table(merged$league_name)
+```
+## forcats - fct_infreq()
+
+This table has no rhyme or reason.  We can use fct_infreq() to sort descending by frequency.
+
+```{r}
+league_table = as.data.frame(table(fct_infreq(merged$league_name)))
+league_table = rename(league_table, 'league_name' = 'Var1')
+league_table
+```
+## ggplot2 - geom_bar()
+
+Now that we have our leagues in a nice order, we can use ggplot2 to plot the frequencies
+
+```{r}
+ggplot(league_table, aes(x=league_name, y = Freq)) + 
+    geom_bar(stat="identity")
+
+
+```
+
+## ggplot2 - theme()
+
+This is kind of a mess.  Let's use theme() to rotate the labels so that we can read them.
+
+```{r}
+ggplot(league_table, aes(x=league_name, y = Freq)) + 
+    geom_bar(stat="identity") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```

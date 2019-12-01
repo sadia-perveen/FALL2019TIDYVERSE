@@ -1,59 +1,94 @@
 # CUNY DATA 607 Fall 2019 Tidyverse recipes
 
+# Avengers dataset 
+Author: Bryan Persaud
+
 I am using the Avengers dataset from FiveThirtyEight and using the dplyr package to demonstrate the filter and full_join function.
 Avengers dataset: https://github.com/fivethirtyeight/data/tree/master/avengers
 
----
-title: "Data 607 TidyVerse Assignment Part 1"
-author: "Bryan Persaud"
-date: "11/26/2019"
-output: html_document
----
-
-```{r}
-library(tidyverse)
-```
-
-# I chose to work with the Avengers dataset 
-
-```{r}
-# Get dataset from URL from FiveThirtyEight github
-Avengers <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv")
-```
-
-# I chose to demonstrate the dplyr package
-
-```{r}
-# Use filter to extract an individual avenger
-Captain_America <- filter(Avengers, Name.Alias == "Steven Rogers")
-Iron_Man <- filter(Avengers, Appearances == "3068")
-Thor <- filter(Avengers, Name.Alias == "Thor Odinson")
-Black_Widow <- filter(Avengers, Name.Alias == "Natalia Alianovna Romanova")
-The_Hulk <- filter(Avengers, Name.Alias == "Robert Bruce Banner")
-Hawkeye <- filter(Avengers, Name.Alias == "Clinton Francis Barton")
-```
-
-```{r}
-# Use full_join to combine everything into one data frame
-Avengers_2012 <- list(Captain_America, Iron_Man, Thor, Black_Widow, The_Hulk, Hawkeye) %>%
-  reduce(full_join, by.x = "URL", by.y = "Appearances")
-Avengers_2012
-```
-
-For my Tidyverse example I used the Avengers dataset from FiveThirtyEight. The dataset contains a list of members of the Avengers group from the Marvel comics. The list shows appearances of when they were first introduced in the comics and if/when they died and/or returned. I used the filter function from the dplyr package to extract every avenger from the 2012 Avengers film. I then put them into a list and used the full_join function from the dplyr function to put every avenger that I got from using the filter function into one data frame.
-
 **Extend an Existing Example**
 
-I extended Stephen Haslett's code as seen below. 
+I extended Stephen Haslett's code.
 
-# This is what Bryan Persaud is adding to Stephen Haslett's code
+=======
+## Objective
+In this assignment, you’ll practice collaborating around a code project with GitHub. You could consider our collective work as building out a book of examples on how to use TidyVerse functions.
 
-```{r}
-ggplot(ramen_top_ten, aes(x = Brand, y = Stars)) + geom_bar(stat = "identity") + labs(title = "Top Ten Listings by Stars", x = "Brand", y = "Stars") + theme(axis.text.x = element_text(angle = 75, size = 14, hjust = 1), axis.text.y = element_text(size = 10))
-```
+## Tasks
+You have two tasks:
 
-```{r}
-ggplot(five_stars, aes(x = Brand, y = Country)) + geom_bar(stat = "identity") + labs(title = "Five Star Ramens by Country", x = "Brand", y = "Country") + theme(axis.text.x = element_text(angle = 75, size = 14, hjust = 1), axis.text.y = element_text(size = 10))
-```
+ 1. **Create an Example** Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
 
-I chose to use ggplot2 package to plot a graph to show the ramens that got a top ten listings from the ramen_top_ten dataframe created. I also used ggplot2 to show the ramens that got a five star rating from the five_stars dataframe.
+ 1. **Extend an Existing Example** Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+
+## Collaboration
+You should [fork](https://github.community/t5/Support-Protips/The-difference-between-forking-and-cloning-a-repository/ba-p/1372) the provided repository and then clone it locally if you wish. Once you have code to submit, you should make a pull request on the shared repository. Minimally, you should submit `.Rmd` files. Ideally, you should also submit an `.md` file and update the README.md file with your example.
+
+### Advice
+If you are going to use RStudio as your version control software, make sure to add `*.Rproj` and `.gitignore` to your .gitignore file **before** you make any commits. Otherwise you run the risk of trying to push that to the master repository in a pull request.
+
+## Notification
+***After you’ve completed both parts of the assignment, please submit your GitHub handle name in the submission link provided in the week 1 folder!*** This will let your instructor know that your work is ready to be graded.
+
+## Deadline
+You should complete both parts of the assignment and make your submission no later than end of day on Sunday, November 24th.
+
+## References
+* GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE
+* FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
+* Kaggle datasets:  https://www.kaggle.com/datasets
+
+## Vignettes
+
+### Ramen Ratings
+Author: Stephen Haslett
+
+**GitHub Repository**: https://github.com/stephen-haslett/FALL2019TIDYVERSE
+
+**Data Source**: https://www.kaggle.com/residentmario/ramen-ratings/data
+
+**RPubs Location**: http://rpubs.com/stephenhaslett/554575
+
+**Task 1**: SHaslett-607-Tidyverse-assignment.Rmd. For task 1, I imported the ramen-ratings dataset from Kaggle (https://www.kaggle.com/residentmario/ramen-ratings/data)
+into R using the "readr" package. I then demonstrated the dplyr package's "slice", "filter", and "select" functions.
+
+### Create a Document Term Matrix
+Author: Jai Jeffryes
+
+A document term matrix (DTM) is a data structure that can serve as the input to machine learning models. Tidyverse tools can create this structure.
+
+cf. `candidate_email_dtm.Rmd`
+
+### Trump Approval Ratings from FiveThirtyEight
+Author: Donny Lofland
+
+FiveThirtyEight has aggregated polling data from a number of sources tracking Trump's approval rating since January 2017.  In this programming vignette, we will use TidyVerse packages to load, manipulate, summarize and plot Trump's approval rating over time. 
+
+cf. `trump_approval_ratings.Rmd`
+
+TidyVerse Assignment: 
+
+Part 1:
+Editor: Euclid Zhang
+Date Completed: 11/11/2019
+Action: Create a demonstration of how to use the functions in the purrr package.
+Rpubs: http://rpubs.com/ezaccountz/TidyVerse_Assignment_EZ
+
+Part 2:
+Creator: Lin Li
+Source: https://github.com/lincarrieli/FALL2019TIDYVERSE
+Updater: Euclid Zhang
+Date Completed: 11/17/2019
+Action: Update with a few examples from TidyVerse package.
+
+### Forcats Vignette
+Author:Steven Ellingson
+
+Part 1: Use forcats to easily change the way the levels of your factors are displayed in tables and plots.
+
+cf. `forcats vignette.Rmd`
+
+Part 2: Added some forcats and ggplot2 functions to C Rosemund's soccer data.
+
+cf. `steven_ellingson_tidyverse_part_2.Rmd`
+=======
