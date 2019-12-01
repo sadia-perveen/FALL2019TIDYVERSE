@@ -1,0 +1,122 @@
+---
+title: "How to use forcat-tidyverse"
+author: "Salma Elshahawy"
+date: "11/15/2019"
+output: html_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Forcats package
+
+forcats provides a suite of useful tools that solve common problems with factors. R uses factors to handle categorical variables, variables that have a fixed and known set of possible values.
+
+In the following dataset, we have some categorical variables like **type_of_subject**, **subject_race**. R uses factors to handle those kinds of variables that have  a fixed set of possible values. The forcats package goal is to provide a convenient tools that can solve some issues when dealing with factors, for example, changing the order of  levels or the  values. The following vignette will demonestrate more.
+
+```{r message=FALSE, warning=FALSE}
+if (!require('readr')) install.packages ('readr')
+if (!require('forcats')) install.packages ('forcats')
+if (!require('dplyr')) install.packages ('dplyr')
+if (!require('kableExtra')) install.packages ('kableExtra')
+if (!require('ggplot2')) install.packages ('ggplot2')
+```
+
+The following dataset is a collection of imdb movies including some data about release dat, country of origin,..etc. The dataset was imported from the fivethirtyeight github repo.
+
+I used another useful tidyverse package called **readr** which gives the flexibility to import different file format into your r workspace.
+
+```{r}
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/biopics/biopics.csv"
+df <- read.csv(url, header = TRUE)
+head(df)
+```
+
+If I tried to plot the **type_of_subject** variable as the illustrated below, you will find that the bars haven't distributed uniformly even if you forced them to reorder.  
+
+```{r}
+df_2 <- df %>%
+  arrange(type_of_subject)
+
+ggplot(df_2, aes(x = type_of_subject)) + 
+  geom_bar() + 
+  coord_flip()
+```
+
+To solve this problem, you can use the **fct_infreq()** wich is ships within the **forcats** package. This function is responsible for reordering a factor variable by the frequency of value - notice the change below:
+
+```{r}
+df %>%
+  mutate(type_of_subject = fct_infreq(type_of_subject)) %>%
+  ggplot(aes(x = type_of_subject)) + 
+  geom_bar() + 
+  coord_flip()
+```
+
+Pretty neat! you can easily identify the trends from graphs without any extra processing. 
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+## Updated By: Abdelmalek Hajjam
+
+#### adding few functions from dplyr to demonstrate their use.
+
+
+#### Display with datatable
+```{r}
+library(dplyr)
+DT::datatable(head(df))
+```
+
+#### Select
+```{r}
+# Drop columns that are not necessary
+df_new <- select(df, "title", "country", "year_release", "director", "subject", "type_of_subject", "subject_sex")
+
+# View new data
+DT::datatable(df_new) 
+```
+
+#### Mutate
+```{r}
+library(lubridate)
+# Create new column from existing columns
+df_new <- mutate(df_new, friendly_year_released = paste0(year(today()) - df_new$year_release, " years ago"))
+
+df_new <- select(df_new, "title", "country", "year_release", "friendly_year_released", "director", "subject", "type_of_subject", "subject_sex")
+
+DT::datatable(df_new) 
+```
+
+
+#### Filter
+```{r}
+# Filter data, return rows where year = 2000
+df_new_2000 <- filter(df_new, year_release == "2000")
+
+DT::datatable(df_new_2000)
+
+```
+
+
+#### Arrange (sort)
+```{r}
+# sort data by year_release
+sorted_df_new <- arrange(df_new, desc(year_release))
+
+DT::datatable(sorted_df_new)
+
+```
+
+
+
+
+
+
+
+
+
+
+
