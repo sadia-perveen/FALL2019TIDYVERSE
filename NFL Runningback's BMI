@@ -1,0 +1,39 @@
+---
+title: "TidyVerse Project"
+author: "Will Outcault"
+date: "11/30/2019"
+output: html_document
+---
+
+# Read Data
+```{r}
+df <- read.csv("https://raw.githubusercontent.com/willoutcault/Data607-Data-Acquisition/master/runningbacks%20consolidated.csv", TRUE, ",")
+```
+
+# Select Factors of Interest
+```{r}
+library(tidyr, dplyr)
+df2 <- select(df, "DisplayName", "PlayerHeight", "PlayerWeight")
+```
+
+# Seperate Feet and Inches in Height Column
+```{r}
+df3 <- df2 %>% separate(PlayerHeight, c("feet", "inches"), sep = "-", remove = TRUE)
+df3$feet <- factor(df3$feet)
+df3$feet <- as.numeric(df3$feet)
+df3$inches <- factor(df3$inches)
+df3$inches <- as.numeric(df3$inches)
+```
+
+# Create Column with Total Inches
+```{r}
+df4 <- df3 %>% mutate(Height = (feet*12) + inches) %>%
+  select("DisplayName", "Height", "PlayerWeight")
+```
+
+# Use BMI Forumla to Calculate Player's BMI
+```{r}
+df5 <- df4 %>%
+  mutate(bmi = 703*PlayerWeight/(Height^2))
+df5
+```
