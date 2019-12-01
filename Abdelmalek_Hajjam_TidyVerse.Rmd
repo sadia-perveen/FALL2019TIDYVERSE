@@ -1,0 +1,137 @@
+---
+title: "Tidyverse"
+author: "Abdelmalek Hajjam"
+date: "11/30/2019"
+output: html_document
+---
+
+### Where did the Data come from?
+
+I'm using a dataset from here: https://github.com/fivethirtyeight/data/tree/master/ncaa-womens-basketball-tournament
+
+This folder contains the data behind the story 'The Rise And Fall Of Women’s NCAA Tournament Dynasties'.
+
+NCAA Women's Basketball Tournament data contains information for every team that has participated in the NCAA Division I Women’s Basketball Tournament since it began in 1982. Every school is shown with its seed, conference record (when available), regular-season record, tournament record and full season record, including winning percentages. 
+
+Seed = The (OR) seeding designation in 1983 notes the eight teams that played an opening-round game to become the No. 8 seed in each region.
+
+How qual = Whether the school qualified with an automatic bid (by winning its conference or conference tournament) or an at-large bid.
+
+1st game at home = Whether the school played its first-round tournament games on its home court.
+
+Tourney finish = The round of the final game for each team. OR=opening-round loss (1983 only); 1st=first-round loss; 2nd=second-round loss; RSF=loss in the Sweet 16; RF=loss in the Elite Eight; NSF=loss in the national semifinals; N2nd=national runner-up; Champ=national champions
+
+
+```{r warning=FALSE, message=FALSE}
+library(tidyr)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(kableExtra)
+```
+
+
+### load and check the data
+
+```{r}
+DataSet <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/ncaa-womens-basketball-tournament/ncaa-womens-basketball-tournament-history.csv", sep = ",", stringsAsFactors = F)
+
+DT::datatable(head(DataSet))
+
+colnames(DataSet)
+
+```
+
+
+### We don't like some of the names, let's rename them
+
+```{r}
+# Rename columns
+names(DataSet) <- c("Year", "School", "Seed", "Conference", "ConfW", "ConfL","Conf", "ConfPlace", "RegW", "RegL", "Reg", "HowQual", "X1stGameAtHome", "TourneyW", "TourneyL", "TourneyFinish", "FullW", "FullL", "Full")
+
+# check now
+DT::datatable(head(DataSet))
+
+```
+
+
+### Columns that we do not like, need to be dropped. Only keep the ones we like
+
+```{r}
+# Drop columns that are not necessary
+ShinyDataSet <- select(DataSet, "Year", "Seed", "Conference", "HowQual", "X1stGameAtHome", "TourneyW", "TourneyL", "TourneyFinish", "FullW", "FullL", "Full")
+
+# View new data
+DT::datatable(head(ShinyDataSet)) 
+```
+
+
+### Mutate
+
+```{r}
+# Create new column from existing columns
+ShinyDataSet <- mutate(ShinyDataSet, FullWToLRatio = round(ShinyDataSet$FullW/ShinyDataSet$FullL))
+```
+
+### Filter
+
+``` {r }
+# Filter data, return rows where year = 2000
+ShinyDataSet_2000 <- filter(ShinyDataSet, Year == "2000")
+
+DT::datatable(head(ShinyDataSet_2000))
+
+```
+
+
+### Sort
+
+```{r}
+
+# Sorted By FullWToLRatio Descending (desc)
+SortedShinyDataSet <- arrange(ShinyDataSet, desc(FullWToLRatio))
+
+# Removing missing values(NA)
+SortedShinyDataSet$FullWToLRatio <- as.numeric(na.omit(SortedShinyDataSet$FullWToLRatio))
+
+DT::datatable(head(SortedShinyDataSet))
+```
+
+
+### what do we do with the inf value in the column FullWToLRatio, which is the division by zero (0)
+
+```{r}
+#if FullWToLRatio = 0, let's replace it with FullW
+SortedShinyDataSet = SortedShinyDataSet %>% mutate(FullWToLRatio = factor(ifelse(FullL == 0, FullW, FullWToLRatio)))
+
+FullWToLRatioLevels <- cut(as.numeric(SortedShinyDataSet$FullWToLRatio), breaks = 10) %>% levels
+
+DT::datatable(head(SortedShinyDataSet))
+
+```
+
+
+### Level-Up
+
+```{r}
+#what are our levels?
+FullWToLRatioLevels 
+```
+
+### Summarise
+
+``` {r }
+summarise(SortedShinyDataSet, "MeanWLRatio" = mean(as.numeric(SortedShinyDataSet$FullWToLRatio), na.rm = TRUE), "SDWLRatio" = sd(as.numeric(SortedShinyDataSet$FullWToLRatio), na.rm = TRUE))
+```
+
+### Visualize This!
+
+```{r warning=FALSE, message=FALSE}
+#plot the histogram
+ggplot(data = SortedShinyDataSet, aes(x = as.numeric(SortedShinyDataSet$FullWToLRatio)), color = "gold") + 
+  labs(title="Win to loss Ratio Histogram", x="Win to loss Ratio", y="Count") +
+  geom_histogram(stat="Count", color = "gold")
+
+
+```
+
