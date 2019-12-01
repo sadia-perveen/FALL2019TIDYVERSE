@@ -1,7 +1,7 @@
 # CUNY DATA 607 Fall 2019 Tidyverse recipes
 
 I am using the Avengers dataset from FiveThirtyEight and using the dplyr package to demonstrate the filter and full_join function.
-Avengers dataset: https://github.com/fivethirtyeight/data/tree/master/avengers
+Avengers dataset: https://github.com/fivethirtyeight/data/tree/master/avengers.
 
 ---
 title: "Data 607 TidyVerse Assignment Part 1"
