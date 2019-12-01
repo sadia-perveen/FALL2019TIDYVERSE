@@ -115,3 +115,10 @@ Author: Zach Alexander
 
 * Part 2: I extended Euclid Zhang's example, adding to his great plots by creating a ggplot2 plot of my own, as well as utilizing some tidyr and dplyr functions to manipulate the weather data he provided.
   * You can find this here: http://rpubs.com/zachalexander/tidyext
+  
+## Masculinity Dataset
+Author: Amber Ferger
+
+* Part 1: I decided to use the dataset that corresponds to the What Do Men Think It Means To Be A Man? article on FiveThirtyEight.com. The article can be found here: https://fivethirtyeight.com/features/what-do-men-think-it-means-to-be-a-man/. This project focuses on the tibble, dplyr, and ggplot 2 packages. I focus on aggregating the data and displaying differences in responses between 2 demographic features. The final markdown file can be found here: http://rpubs.com/amberferger/DATA607_Tidyverse
+
+* Part 2: I extended the Fight Songs vignette by Scott Reed to include additional aggregations. 
