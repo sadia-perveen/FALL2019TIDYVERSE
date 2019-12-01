@@ -1,0 +1,97 @@
+---
+title: "Tidyverse Assignment - Ramen Ratings"
+author: "Stephen Haslett"
+date: "11/25/2019"
+output:
+  rmdformats::readthedown
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment Overview
+
+**Create an Example** Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset.
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rmdformats)
+```
+
+
+## Assignment Response
+
+For this assignment, I have chosen to demonstrate the basic functionailty supplied by the dplry package that comes with tidyverse.
+
+## Datasource
+https://www.kaggle.com/residentmario/ramen-ratings/data
+
+
+#### Import the Ramen Ratings dataset using the "readr" package.
+
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE}
+ramen_ratings <- read.csv("https://raw.githubusercontent.com/stephen-haslett/FALL2019TIDYVERSE/master/ramen-ratings.csv", header = TRUE)
+```
+
+
+#### Check that the data imported successfully.
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE}
+ramen_ratings <- as_tibble(ramen_ratings)
+head(ramen_ratings)
+```
+
+
+#### Using the "dplyr" package's "slice" function, select a specific range of rows from the dataset.
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE}
+# Select rows 10 to 20 from the dataset.
+selected_rows <- slice(ramen_ratings, 10:19)
+selected_rows
+```
+
+
+#### Now use the "slice" function to select 2 row ranges, and 4 specific rows.
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE}
+# Select rows 2 to 9, 26 to 30, and rows 40, 21, 16, and 35.
+multiple_selected_rows <- ramen_ratings %>% slice(c(2:9, 26:30, 40, 21, 16, 35))
+multiple_selected_rows
+```
+
+
+#### Use dplyr's "filter" function to select rows based on specified conditions.
+
+_In this example, we will only select rows that have a 5 Star rating._
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE}
+five_stars <- filter(ramen_ratings, Stars == 5)
+five_stars
+```
+
+
+#### Finally, use dplyr's "select" function to select specific data columns from the dataset.
+
+_In this example, we will select the "Brand", "Variety", "Country", "Stars", and "Top.Ten" columns for brands that have a Top.Ten listing._
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE}
+# Select only the rows with Top.Ten column entries whilst removing those
+# with NA, empty, or "\n" values.
+ramen_ratings_filtered <- filter(ramen_ratings, Top.Ten != "" & !is.na(Top.Ten) & Top.Ten != "\n")
+ramen_top_ten <- select(ramen_ratings_filtered, c("Brand", "Variety", "Country", "Stars", "Top.Ten"))
+ramen_top_ten
+```
+
+# This is what Bryan Persaud is adding to Stephen Haslett's code
+
+```{r}
+ggplot(ramen_top_ten, aes(x = Brand, y = Stars)) + geom_bar(stat = "identity") + labs(title = "Top Ten Listings by Stars", x = "Brand", y = "Stars") + theme(axis.text.x = element_text(angle = 75, size = 14, hjust = 1), axis.text.y = element_text(size = 10))
+```
+
+```{r}
+ggplot(five_stars, aes(x = Brand, y = Country)) + geom_bar(stat = "identity") + labs(title = "Five Star Ramens by Country", x = "Brand", y = "Country") + theme(axis.text.x = element_text(angle = 75, size = 14, hjust = 1), axis.text.y = element_text(size = 10))
+```
+
+I chose to use ggplot2 package to plot a graph to show the ramens that got a top ten listings from the ramen_top_ten dataframe created. I also used ggplot2 to show the ramens that got a five star rating from the five_stars dataframe.

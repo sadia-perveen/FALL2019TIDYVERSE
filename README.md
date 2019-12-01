@@ -1,5 +1,16 @@
 # CUNY DATA 607 Fall 2019 Tidyverse recipes
 
+# Avengers dataset 
+Author: Bryan Persaud
+
+I am using the Avengers dataset from FiveThirtyEight and using the dplyr package to demonstrate the filter and full_join function.
+Avengers dataset: https://github.com/fivethirtyeight/data/tree/master/avengers
+
+**Extend an Existing Example**
+
+I extended Stephen Haslett's code.
+
+=======
 ## Objective
 In this assignment, you’ll practice collaborating around a code project with GitHub. You could consider our collective work as building out a book of examples on how to use TidyVerse functions.
 
