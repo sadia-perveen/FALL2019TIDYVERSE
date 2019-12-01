@@ -1,0 +1,109 @@
+---
+title: "TidyVerse Project"
+author: "Sie Siong Wong"
+date: "10/31/2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+theme: lumen
+---
+
+## Objective 
+
+- Dplyr annd GGPlot is the TidyVerse packages that I choose to create a programming sample to demonstrate how to use its capabilities from reshape the data to plot analysis result.The dataset is Ramen Rating and got this from Kaggle.
+
+## What is dplyr?
+
+- It is the next iteration of plyr package.
+- It is faster and has a more consistent of API.
+- It provides a set of tools that help you solve the most common data manipulation challenges.
+
+## What is GGPlot?
+
+- GGPlot was based on the Grammar of Graphics.
+- It puts an organized framework around the various parts of a graph.
+- The components of ggplot grammar are data, aesthetic mapping, geom, stat, scales, theme, and so on. 
+- It can be used to create scatter plots, boxplots, histograms, lines best approximating data, etc.
+- It is robust and has served statisticians well.
+
+
+## Load the Packages
+
+```{r, eval=TRUE, message=FALSE}
+
+library(dplyr)
+library(ggplot2)
+
+```
+
+## Load the Dataset
+
+```{r, eval=TRUE}
+
+rr <- read.csv("https://raw.githubusercontent.com/SieSiongWong/DATA-607/master/Project%20TidyVerse/RamenRatings.csv", header=TRUE, stringsAsFactors = FALSE)
+
+head(rr)
+
+```
+
+## Clean and Tidy the Data
+
+```{r, eval=TRUE, message=FALSE}
+
+# Convert Stars column from factor to numeric.
+rr$Stars <-as.numeric(rr$Stars)
+
+# You can use the 'select' function to pick variables based on their names.
+rr.df <- select (rr, Brand, Country, Stars)
+
+# or you can do this way using the combination of 'pipe' and 'select' functions. The pipe allows you to pipe the output of one function to the input of another function.
+rr.df <- rr %>% select (Brand, Country, Stars)
+
+# You can use the 'rename' function to rename the column name.
+rr.df <- rr.df %>% rename ("Ratings"="Stars")
+
+# Using filter to select only numeric data on Stars column.
+rr.df <- rr.df %>% filter(!is.na(Ratings))
+
+# To move specific column to the beginning of a dataframe, we can use the 'select' and 'everything' functions.
+rr.df <- rr.df %>% select(Country, everything())
+
+# To sort the Country column in descending order, we can use the 'arrange' function.
+rr.df <- rr.df %>% arrange(Country)
+
+```
+
+## Reshape and Analyze the Data
+
+```{r, eval=TRUE, message=FALSE}
+
+# Another very useful function is the 'group_by'. YOu can use this function to group the same elements together and then use the 'summarise' function to collapse each group into a single-row summary. For example, we can group country and brand and then do the average for each brand. 
+rr.df.avg1 <- rr.df %>% group_by(Country, Brand) %>% summarise(Average=mean(Ratings))
+
+# Very often you'll want to create new columns based on the values in existing columns, for example like previous example to get average ratings for each brand. In this case, you can use the 'mutate' function. The difference between summarise and mutate functions is that using 'mutate' will keep all existing columns in the output while 'summarise' will not show the column variable which is used to perform the calculation.  
+rr.df.avg2 <- rr.df %>% group_by(Country, Brand) %>% mutate(Average=mean(Ratings))
+
+# You also can use the 'transmute' to only show the grouped and new column variables just like the summarise function.
+rr.df.avg3 <- rr.df %>% group_by(Country, Brand) %>% transmute(Average=mean(Ratings))
+
+```
+
+## Plot the Analysis Result
+
+```{r, eval=TRUE}
+
+# In the ggplot() parenthesis, the data source is 'rr.df.avg1', and within the aesthetic parenthesis you'll need to define the x and y variables. In this case, the x=Country, y=Average. If you want to include legend, you can put fill=Country in the aes().
+ggplot(rr.df.avg1, aes(x=Country, y=Average)) + geom_boxplot()
+
+# You notice that the boxplots are not in the order. To sort the boxplots in the order, we can use the 'reorder' function and use median as reference parameter to sort.
+ggplot(rr.df.avg1, aes(x=reorder(factor(Country),Average, fun=median),y=Average)) + geom_boxplot() 
+
+# Also, we can further refine the plot to include title and y-axis label. To do this, the argument for title is 'title' and the argument for y-axis label is 'ylab'. 
+ggplot(rr.df.avg1, aes(x=reorder(factor(Country), Average, fun=median),y=Average)) + geom_boxplot() + labs(title="Average Ramen Ratings for Each Country") + ylab("Average Ratings")
+
+# In this example, I will use the 'fill' to include legend so that color will be automatically assigned to each box plot and then remove the legend display manually. We can use 'theme()' to customize the plot's look. To remove legend display, you can use 'legend.position', and to remove x-axis label, you can use 'axis.title.x'. Also, we can adjust the plot title height position using' plot.title'.Since there are so many labels for the x-axis in this example, we can turn the x-axis text into 90 degree angle and adjust their margin using 'axis.text.x'. 
+ggplot(rr.df.avg1, aes(x=reorder(factor(Country), Average, fun=median),y=Average,fill=factor(Country))) + geom_boxplot() + labs(title="Average Ramen Ratings for Each Country") + ylab("Average Ratings") + theme(legend.position = "none", axis.title.x = element_blank(), axis.text.x=element_text(angle=90, margin=margin(t = 10, r = 0, b = 0, l = 0)), plot.title = element_text(hjust=0.5))
+
+```

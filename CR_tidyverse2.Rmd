@@ -1,0 +1,78 @@
+---
+title: "Tidyverse Part 2"
+author: "C. Rosemond"
+date: "November 24, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, eval=TRUE}
+library(tidyverse)
+```
+
+
+### Part 2 - An extension of the Part 1 vignette by Suwarman Sufian
+This is an extension of the Part 1 vignette by Suwarman Sufian. Please see the links immediately below for Suwarman's code.
+
+Rpubs link: http://rpubs.com/ssufian/548044
+Github: https://github.com/ssufian/FALL2019TIDYVERSE/blob/master/Data-607-Tidyverse-Project-orig.Rmd
+
+<br>
+
+### Loading polling estimates
+I start by loading polling estimate data, which include approval and disapproval estimates over time.
+
+```{r load, eval=TRUE, message=FALSE}
+polls <- read_csv("https://raw.githubusercontent.com/ssufian/Data_607/master/approval_topline.csv")
+summary(polls)
+```
+
+```{r dates, eval=TRUE, warning=FALSE}
+polls$modeldate <- as.Date(polls$modeldate, "%m/%d/%Y")
+polls$subgroup <- factor(polls$subgroup, levels = c("All polls", "Adults", "Voters"))
+```
+
+<br>
+
+### Modeling estimates of approval, by subgroup and approval status, of POTUS since inauguration (01/20/2019) using ggplot2
+I use a combination of dplyr, tidyr, and ggplot2 functions to create line plots showing estimated approval of POTUS from inauguration to present.
+
+#### By polled subgroup
+This line plot displays model estimates of approval of POTUS since inauguration, by subgroup. Subgroups include results across all polls, for all adults, and for all voters. Approval peaked around 45% at inauguration (1/20/2017) then dipped to around 37.5% by the end of 2017; since spring of 2018, estimates have settled at just over 40% approval. Over time, voters approve of POTUS at higher rates than do all adults, with the average of all polls falling in between the voter and adult subgroup rates.  
+
+```{r subgroup, eval=TRUE}
+polls %>% filter(modeldate >= "2017-01-20") %>%
+  rename(Subgroup = subgroup) %>%
+  ggplot(aes(x = modeldate, y = approve_estimate, group = Subgroup)) +
+    geom_line(aes(color = Subgroup)) +
+    scale_color_brewer(palette = "Dark2") +
+    labs(title = "Model estimates of approval of POTUS since inauguration, by subgroup",
+         x = "Date",
+         y = "Estimate of Approval (%)") +
+    theme_classic()
+```
+
+<br>
+
+#### By approval status
+This line plot displays model estimates, across all polls, of approval and disapproval of POTUS since inauguration. Approval follows the pattern described above, peaking at inauguration then dipping during 2017 and finally stabilizing starting in early-to-mid-2018. By contrast, disapproval rates rose from a low just above 40% at inauguration to above 55% through 2017 until settling slightly lower, around 52.5%, at the start of 2018. The relative trough of approval and peak of disapproval in early 2019 appear to coincide with the government shutdown.
+
+```{r lineplot, eval=TRUE}
+polls %>% mutate(id = row_number()) %>%
+  select(one_of(c("id", "subgroup", "modeldate", "approve_estimate", "disapprove_estimate"))) %>%
+  rename(Approval = approve_estimate, Disapproval = disapprove_estimate) %>%
+  filter(subgroup == "All polls" & modeldate >= "2017-01-20") %>%
+  select(-subgroup) %>%
+  gather(Status, estimate, -id, -modeldate) %>%
+  ggplot(aes(x = modeldate, y = estimate, group = Status)) +
+    geom_line(aes(color = Status)) +
+    scale_color_brewer(palette = "Set1") +
+    labs(title = "Model estimates of approval and disapproval of POTUS since inauguration",
+         x = "Date",
+         y = "Estimate across all polls (%)") +
+    theme_classic()
+```
+
