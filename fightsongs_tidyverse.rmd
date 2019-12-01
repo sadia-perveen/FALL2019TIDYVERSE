@@ -42,4 +42,36 @@ fightSongs  %>% filter(!is.na(nameLength)) %>% ggplot(aes(x=spelling, fill=nameL
 
 Well it does seem that there may be more spelling with longer names.
 
+## Summarizing by Duration
+First, we'll take a look at the the average number of seconds per song, grouped by student_writer:
 
+``` {r}
+
+library(tidyverse)
+
+fightSongs %>%
+  group_by(student_writer) %>%
+  summarise(avg_seconds = mean(sec_duration),
+            median_seconds = median(sec_duration),
+            sd_seconds = sd(sec_duration))
+
+boxplot(sec_duration~ student_writer,data = fightSongs)
+
+```
+
+It's a bit hard to see from the boxplot, but we can tell from the summary data that student writers tend to write songs that are around 5 seconds longer than those not written by student writers. 
+
+Next, we'll look at the bpm, also grouped by student_writer:
+``` {r}
+
+fightSongs %>%
+  group_by(student_writer) %>%
+  summarise(avg_bpm = mean(bpm),
+            median_bpm = median(bpm),
+            sd_bpm = sd(bpm))
+
+boxplot(bpm~ student_writer,data = fightSongs)
+
+```
+
+Interestingly, student writers tend to write songs that are slower than non-student writers!
