@@ -51,7 +51,12 @@ The dataset used here in my Vignette is the NCAA Women's Basketball Tournament d
 
 * TidyVerse Assignment: http://rpubs.com/ahajjam/554990
 
-* TidyVerse Code: https://github.com/theoracley/FALL2019TIDYVERSE/blob/master/Abdelmalek_Hajjam_TidyVerse.Rmd
+* TidyVerse Task1 Vignette: https://github.com/theoracley/FALL2019TIDYVERSE/blob/master/Abdelmalek_Hajjam_TidyVerse.Rmd
+
+#### I also updated Salma's Vigntte using some dylyr functions:
+
+* TidyVerse Task2 Updated Salma's Vignette: https://github.com/theoracley/FALL2019TIDYVERSE/blob/master/Abdelmalek_Hajjam_Updated_Salma_Vignette.Rmd
+
 
 
 
