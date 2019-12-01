@@ -85,6 +85,18 @@ Part 2: Added some forcats and ggplot2 functions to C Rosemund's soccer data.
 
 cf. `steven_ellingson_tidyverse_part_2.Rmd`
 
+
+### Fight Songs Vignette
+Author:Scott Reed
+
+Part 1: Use readr, stringr, purr, and dplyr to analyze fightsongs and see if spelling is more common with authors with longer names.
+
+cf. `fightsongs_tidyvrese.rmd`
+
+Part 2: switch to readr then use stringr, lubridate to fix a problem with the data, and then graph using ggplot.
+
+cf. `NFL Runningback's BMI_sr.rmd`
+
 # Avengers dataset 
 Author: Bryan Persaud
 

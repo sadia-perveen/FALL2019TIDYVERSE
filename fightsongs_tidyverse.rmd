@@ -1,0 +1,45 @@
+---
+title: "Tidyverse example"
+author: "Scott Reed"
+date: "11/30/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(purrr)
+```
+
+## Tidyverse Example -- readr - dplyr - purrr - stringr  - Fight Songs
+
+This is a short example to show some tidyverse functionality. We first use readr to grab the FiveThirtyEight fight song database of categorized fight songs, and force it to be a tibble. 
+
+```{r }
+fightSongs<-read_csv(url("https://raw.githubusercontent.com/fivethirtyeight/data/master/fight-songs/fight-songs.csv"))
+```
+
+## Dplyr to clean data
+
+We have some unknowns and those will best be handled by marking those as NA. 
+
+```{r}
+fightSongs<-fightSongs %>% mutate_if(is.character, list(~na_if(., "Unknown")))
+fightSongs$year <- as.numeric(fightSongs$year)
+```
+
+We can then use ggplot and a simple dplyr filter to see a plot of when songs were written
+```{r}
+fightSongs %>% filter(!is.na(year)) %>% ggplot()+geom_bar(aes(year - year %% 10, group=conference, color=conference, fill=conference))
+```
+
+We can also see if names that are longer (using stringr to split on white space, and the "friendly with tidyverse) are more likely to have songs that spell out names. 
+
+```{r}
+fightSongs$nameLength <-unlist( purrr::map(purrr::map(str_split(fightSongs$writers,"\\s"), nchar),max))
+fightSongs  %>% filter(!is.na(nameLength)) %>% ggplot(aes(x=spelling, fill=nameLength>7)) + geom_bar(position="dodge", stat="count")
+```
+
+Well it does seem that there may be more spelling with longer names.
+
+
