@@ -1,0 +1,221 @@
+---
+title: "Data607_Tidyverse_Vignette_Part_2"
+author: "C. Rosemond, Extended by Fan Xu"
+date: "12/1/2019"
+output:
+  md_document:
+    variant: markdown_github
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_collapsed: yes
+    toc_float: yes
+  pdf_document:
+        extra_dependencies: ["geometry", "multicol", "multirow"]
+theme: lumen
+number_sections: yes
+toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Part 1 by Rosemond
+
+title: "Tidyverse Part 1"
+author: "C. Rosemond"
+date: "November 2, 2019"
+output: html_document
+
+
+
+## Library
+
+```{r library, message=FALSE}
+library(tidyverse)
+```
+
+
+## Data Set(s)
+
+I selected two fivethirtyeight data sets: one that contains current Soccer Power Index (SPI) ratings and rankings for men's club teams and a second that contains match-by-match SPI ratings and forecasts back to 2016.
+
+URL: https://github.com/fivethirtyeight/data/tree/master/soccer-spi
+
+
+## readr - read_csv()
+
+The readr package facilitates the reading in of 'rectangular' data like .csv files or other delimited files. Here, I use the read_csv() function to read in two data sets: the global rankings, or 'rankings', and the matches, or 'matches'.
+
+```{r read_csv1, eval=TRUE, message=FALSE}
+rankings <- read_csv('https://projects.fivethirtyeight.com/soccer-api/club/spi_global_rankings.csv')
+matches <- read_csv('https://projects.fivethirtyeight.com/soccer-api/club/spi_matches.csv')
+head(rankings)
+tail(matches)
+```
+
+
+## dplyr - mutate()
+
+The dplyr package provides a grammar for the manipulation of data--notably, in data frames or tibbles. Here, I use the mutate function to add a new column--a match ID--to the matches tibble.
+
+
+```{r mutate, eval=TRUE}
+matches <- mutate(matches, match = row_number())
+matches <- matches[,c(23,1:22)]
+head(matches)
+```
+
+
+## dplyr - select()
+
+The select function from dplyr enables the selection of data frame columns by name or helper function. Here, I select and keep the first six columns ('match' through 'team2') from the matches tibble.
+
+```{r select, eval=TRUE}
+matches <- select(matches, match:team2)
+head(matches)
+```
+
+
+## dplyr - filter()
+
+The filter function from dplyr enables the subsetting of rows based on specified logical criteria. Here, I select matches that occurred from November 1st through November 7th.
+
+```{r filter, eval=TRUE}
+matches <- filter(matches, date >= '2019-11-01' & date <= '2019-11-07')
+head(matches)
+```
+
+
+## tidyr - gather()
+
+The tidyr package is designed to facilitate reshaping data. Here, I use the gather() function to reshape the matches tibble from wide to long format, gathering the separate team columns.
+
+```{r gather, eval=TRUE}
+matches <- matches %>% gather(-match, -date, -league_id, -league, key=team_number, value=name) %>% select(-team_number)
+head(matches)
+```
+
+
+## dplyr - arrange()
+
+The arrange function from dplyr enables the sorting of data based upon column values. Here, I arrange the matches tibble by match number.
+
+```{r arrange, eval=TRUE}
+matches <- arrange(matches, match)
+head(matches)
+```
+
+
+## dplyr - left_join()
+
+The left_join function works similarly to its SQL counterparts. I finish by using 'name' to merge the matches tibble with the rankings tibble, which contains club rankings and ratings as of November 7th.
+
+```{r left_join, eval=TRUE}
+merged <- dplyr::left_join(matches, rankings, by='name')
+merged <- select(merged, -league.y, - off, -def)
+head(merged)
+```
+
+
+# Part 2 Extension by Fan Xu
+
+title: "Data607_Tidyverse_Vignette_Part_2"
+author: "Fan Xu"
+date: "12/1/2019"
+
+
+## stringr::str_extract
+
+`str_extract` is used when I want to get content from a string according to a comment pattern denoted by regular expression. Regular expression is out of the scope of this assignment so I won't go further into details. In this example I used `str_extract` the first 4 digit combo in column 'date' which is the year.
+
+```{r str_extract}
+date_year <- mutate(merged, year = str_extract(date, '[0-9]{4}'))
+date_year
+```
+
+
+## tidyr::seperate
+
+Another way to get the year column is to convert the column into 'Date' format then use `seperate` function to seperate 'year', 'month' and 'date' into three columns.
+
+```{r separate}
+date_year <- mutate(merged, date = as.Date(date))
+date_year <- separate(date_year, date, c('year','month','date'))
+
+date_year
+```
+
+
+## tidyr::unite
+
+The `unite` function is used to comcatnate values of two columns into a new column. The argument 'remove' is to indicate whether to remove the original columns that to be united. 
+
+```{r unite}
+date_unite <- unite(date_year, year_month, year, month, sep = '-', remove = TRUE)
+date_unite
+```
+
+
+## dplyr::group_by & dplyr::tally
+
+The `group_by` function groups the dataframe into groups to allow the following operations to be performed by group. Here, I use `group_by` to group the data by the column `league` and `team_name`, then use `tally` to take a look at how many times each team shows up.
+
+```{r group_by, eval=TRUE, message=FALSE}
+group <- group_by(date_unite, league.x, name)
+group <- tally(group)
+group <- arrange(group, n)
+group
+```
+
+
+## Pipe Operator %>%  &  dplyr::rename
+
+The pipe operator '%>%',comes from the `magrittr` package, are embeded in `tidyverse`. It enables a handy coding by inserting the output of the preceding code into the following code by the operator '%>%', which makes R coding cleaner, easier and more straightforward visually. I can perform similar actions from the above code chunks into one piece of code as below:
+
+Note that I used the original spi_matches.csv to extract my desired dataset.
+
+```{r pipe, eval=TRUE, message=FALSE}
+
+# To generate a new dataset from spi_matches.csv
+matches_orig <- read_csv('https://projects.fivethirtyeight.com/soccer-api/club/spi_matches.csv')
+
+overall <- matches_orig %>%
+  mutate(match = row_number()) %>%
+  .[,c(23,1:22)] %>%
+  select(match:spi2) %>%
+  filter(team1=='Liverpool' | team1=='Arsenal' | team1=='Barcelona') %>%
+  select(-team2, -spi2) %>%
+  arrange(date) %>%
+  rename(name = team1, SPI = spi1) %>%
+  left_join(rankings, by='name') %>%
+  select(-league.y, - off, -def, -spi, -rank, -prev_rank) %>%
+  separate(date, c('year','month','date')) %>%
+  unite(month_date, month, date, sep = '-', remove = TRUE) %>%
+  mutate(year = as.numeric(year))
+  
+  
+overall
+```
+
+
+## Visualization: ggplot2
+
+`ggplot2` is a classific package for ploting the data. 
+
+In this example I plot a line graph with column `full_date` as x-axis and `SPI` as y-axis.  The graph below shows the averaged forecasted SPI values from 2016 to 2020 for the teams Liverpool, Arsenal and Barcelona.
+
+```{r plot}
+overall %>% 
+  group_by(name, year) %>%
+  summarise(avg_SPI = mean(SPI)) %>%
+  ggplot() +
+  geom_point(aes(x = year, y = avg_SPI)) +
+  geom_line(aes(x = year, y = avg_SPI, colour = name)) +
+  ggtitle('SPI Forecast from 2016 to 2020') +
+  xlab('Year') +
+  ylab('Average SPI')
+```
+
