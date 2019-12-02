@@ -1,0 +1,68 @@
+---
+title: "Tidy Verse"
+author: "Aaron Zalki"
+date: "12/1/2019"
+output: html_document
+---
+
+# {.tabset}
+
+## Raw Drug-Use Data
+### Background on the Data
+
+I am tidying a fivethirtyeight dataset on drug use [Github](https://github.com/fivethirtyeight/data/tree/master/drug-use-by-age). I am transforming the columns of drugs (3 to 28) into rows, in order to perform analysis on the different drugs used by different age groups.
+It is important to note that any column header in the dataset with the word 'use' is referring to a percentage of those in an age group who have used the specific drug in the past 12 months. 
+Any column header in the dataset with the word 'frequency' is referring to the median number of times a user in an age group used the specific drug in the past 12 months.
+For this analysis, I am only interested in the percentage the drug is used among different age groups.
+
+
+### Loading Data
+
+```{r raw data, include=TRUE}
+library(RCurl)
+raw_drug <- read.csv(text=getURL("https://raw.githubusercontent.com/fivethirtyeight/data/master/drug-use-by-age/drug-use-by-age.csv"), header=TRUE, stringsAsFactors = FALSE)
+head (raw_drug)
+
+```
+
+## Tidy & Transform
+
+
+I am using the packages tidyr and dplyr to change the raw data to its final form.
+```{r transforming, include=TRUE}
+library(tidyr)
+library(dplyr)
+drug_gather <- gather(raw_drug, "Drug", "Percent", 3:28)
+drug_gather$Percent <- as.numeric(drug_gather$Percent)
+drug_separate <- separate(drug_gather, "Drug", c("Drug", "Usage"))
+drug_filter <- filter(drug_separate, Usage=='use')
+
+names (drug_filter) <- c("Age", "Size", "Drug", "Usage", "Percent")
+
+head(drug_filter)
+```
+## Analysis
+
+### Teenagers
+
+I am using the package ggplot to illustrate the differences found in drug use between teenagers and young adults.
+
+```{r teen, include=TRUE}
+library(ggplot2)
+teen <- ggplot(subset(drug_filter, Age %in% c("13","14","15", "16", "17", "18","19")), 
+aes(x=Drug, y=Percent, fill=Age)) + geom_bar(stat="identity", position=position_dodge()) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+teen
+
+```
+
+### Young Adults
+
+```{r young adult, include=TRUE}
+young_adults <- ggplot(subset(drug_filter, Age %in% c("18","19","20","21","22-23","24-25")), 
+aes(x=Drug, y=Percent, fill=Age)) + geom_bar(stat="identity", position=position_dodge()) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+young_adults
+```
+
