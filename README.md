@@ -137,7 +137,7 @@ Part 02: Tidyverse Assignment Part 02 Extended from SHaslett-607-Tidyverse-assig
 * Added group_by()
 * Added ggplot()
 
-Kaggle TidyVerse Vignette
+## Kaggle TidyVerse Vignette
 Author: Shovan Biswas Part 01:
 
 The **dplyr** package makes these steps fast and easy:
