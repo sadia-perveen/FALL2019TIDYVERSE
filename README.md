@@ -18,7 +18,7 @@ In this assignment, you’ll practice collaborating around a code project with G
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
------------------------------------------------------------------------------------------------------------------------------------
+
 Vignettes:
 
 Part 1: Created a .Rmd document to demonstrate how to use some of the TidyVerse functions such as select(), mutate(), count() and ggplot(). 
