@@ -1,0 +1,321 @@
+---
+title: "TidyVerse - a programming sample “vignette”"
+author: "Sufian"
+date: "11/5/2019"
+output: html_document
+---
+
+## Rpubs link: http://rpubs.com/ssufian/548044
+
+## Github: https://github.com/ssufian/FALL2019TIDYVERSE/blob/master/Data-607-Tidyverse-Project-orig.Rmd
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Problem Statement:
+
+In this assignment, we will practice collaborating around a code project with Github as a class.
+
+Using several TidyVerse packages, and the "How Popular is Trump?"  dataset from
+
+fivethirtyeight.com, I’m going to show a programming sample “vignette” that demonstrates how to use the
+
+capabilities of ggplot2, dplyr, readr packages with this particular dataset.
+
+
+```{r message=FALSE, warning=FALSE}
+
+# Load
+library("tidyverse")
+library(ggplot2)
+library(dplyr)
+
+```
+
+## Using readr to read data from a csv file (Github site)
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+
+## Part I:  Sufian's code and vignette
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+
+```{r}
+polls <- read_csv("https://raw.githubusercontent.com/ssufian/Data_607/master/approval_topline.csv")
+
+
+polls1 <- read_csv('https://raw.githubusercontent.com/ssufian/Data_607/master/polling_data.csv')
+
+
+```
+
+##  Using ggplot2 to visualizae data; with pipe operation %>% from dplyr
+
+```{r}
+
+polls1 <- as_tibble(polls1)
+
+```
+
+## Bar Charts of Trump's approval/disapproval ratings by pollster types shown below:
+
+```{r}
+polls1 %>% ggplot(aes(x=pollster, y=adjusted_approve, fill=pollster))+
+  geom_bar(stat = "identity", position = "dodge") + 
+  guides(fill = FALSE) +
+  ggtitle("Trump's approval ratings by Pollster types")+ 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+polls1 %>% ggplot(aes(x=pollster, y=adjusted_disapprove, fill=pollster))+
+  geom_bar(stat = "identity", position = "dodge") + 
+  guides(fill = FALSE) +
+  ggtitle("Trump's disapproval ratings by Pollster types")+ 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+## Trumps Approval/Dis-approval ratings by voter types:
+
+```{r}
+polls1 %>% ggplot(aes(x=subgroup, y=adjusted_approve, fill=subgroup))+
+  geom_bar(stat = "identity", position = "dodge") + 
+  guides(fill = FALSE) +
+  ggtitle("Trump's approval ratings by voter types")+ 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+polls1 %>% ggplot(aes(x=subgroup, y=adjusted_disapprove, fill=subgroup))+
+  geom_bar(stat = "identity", position = "dodge") + 
+  guides(fill = FALSE) +
+  ggtitle("Trump's disapproval ratings by voter types")+ 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+```
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+Observation:
+
+- 2 Things to note in that Trump's approval ratings amongst the 64 pollster is just averaging in the
+
+ mid 45% range while his disapproval ratings is in the mid 60% range
+ 
+- Interesting to note that the voter type that really matters in the 3 sub groupings are adult
+
+registered Voters; this group have an average higher adj. dis-approval ratings for Trump relatively
+
+speaking.
+
+- In parrellel, voters that have an adj. approval ratings for Trump has an overall lower ratings
+
+relative to the dis-approvals among their peers.
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+
+## Tidyverse Capability 1.
+
+Description:
+
+- Using filter we can select rows of the data frame matching conditions.
+
+- filter capability tutorial
+
+
+```{r}
+
+pollfilter <-  filter(polls1, samplesize >800 & samplesize < 1992)
+
+head(pollfilter)
+
+```
+
+##  Tidyverse Capability 2.
+
+Description:
+
+- Using select we can keep the selected variables
+
+- select capability tutorial
+
+```{r}
+
+df<- select(polls1, c("subgroup","pollster","approve", "disapprove"))
+head(df)
+
+```
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+## Part II:  Lin li's code and vignette that Sufian will extend, see below
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+```{r}
+weather <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/us-weather-history/KCLT.csv")
+head(weather,n=2)
+
+
+weather2 <- weather %>% separate(date, c("year", "month", "day"), sep = "-")
+head(weather2,n=2)
+```
+
+```{r}
+weather3 <- select(weather2, year, actual_mean_temp, record_min_temp, record_max_temp, record_precipitation)
+
+head(weather3,n=2)
+```
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+## Extending the mutate function as an example, see below
+
+##  Tidyverse Capability 3 on Lin Li's vignette.
+
+Description:
+
+- Using mutate to create another column based on existing column
+
+- For ex: creating a z-score of another column
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+```{r}
+weather4 <- weather3 %>% 
+  mutate( precipitation_z_score = (record_precipitation - mean(record_precipitation)/sd(record_precipitation)))
+
+head(weather4)
+```
+
+##  Tidyverse Capability 4
+
+Description:
+
+- Using top_n function to select and order top n entries
+
+```{r}
+weather5 <- weather4 %>% top_n(actual_mean_temp, n= 5)
+
+(weather5)
+```
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+# Part II:  Extending Sufian Suwarman's code and vignette by Sie Siong Wong
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+
+## Load data
+
+```{r, eval=TRUE}
+
+# Read data.
+polls <- read.csv("https://raw.githubusercontent.com/ssufian/Data_607/master/approval_topline.csv", header=TRUE,stringsAsFactors = FALSE)
+
+polls2 <- read.csv('https://raw.githubusercontent.com/ssufian/Data_607/master/polling_data.csv', header=TRUE, stringsAsFactors = FALSE)
+
+```
+
+## Extending Sufian's Code
+
+### Trump's Approval Change Over Time
+
+- It will be interesting to see how Trump's approval change over the time by using the dplyr packages functions such as group_by and summarize and then plot the trend.
+
+```{r, eval=TRUE}
+
+# Approval rates.
+average.approve <- polls2 %>% 
+  select(enddate, adjusted_approve) %>%
+  group_by(enddate) %>% 
+  summarise(average_approve = mean(adjusted_approve))
+  
+# Disapproval rates.
+average.disapprove <- polls2 %>% 
+  select(enddate, adjusted_disapprove) %>%
+  group_by(enddate) %>% 
+  summarise(average_disapprove = mean(adjusted_disapprove))
+
+# Merge two dataframe together.
+average.final <- merge(average.approve,average.disapprove)
+average.final$enddate <- anytime::anydate(average.final$enddate)
+
+# We can plot the approval and disapproval ratings together.
+ggplot(average.final, aes(x=enddate)) +
+  ggtitle("Approval & Disapproval") + ylab("%") + 
+  geom_smooth(aes(y=average_approve, group=1, colour="Approval")) + geom_smooth(aes(y=average_disapprove, group=2, colour="Disapproval")) + 
+  theme(plot.title = element_text(hjust=0.5), axis.title.x=element_blank(), axis.text.x=element_text(angle=180,hjust=1),legend.position=c(0.6,0.9),legend.title=element_blank())
+
+```
+
+- From the chart, we can see that president Trump's approval rate has been declined sharply since he took office in January 2017. But his approval rate started to increase again in Fall 2017 and become quite steady around 43% from March 2018 forward but starts to trend down recently. It is quite interesting to see the disapproval rate is exactly the opposite side of approval rate. Not sure if the data
+
+### Compare Estimate Approval Rate
+
+```{r, eval=TRUE}
+
+# Estimate approval rate.
+average.approve.estimate <- polls %>% 
+  select(modeldate, approve_estimate) %>%
+  group_by(modeldate) %>% 
+  summarise(average_approve_estimate = mean(approve_estimate))
+
+average.approve.estimate$modeldate <- anytime::anydate(average.approve.estimate$modeldate)
+
+# Plot to compare estimate and survey approval rate.
+ggplot(NULL) +
+  ggtitle("Estimate vs Survey Approval Rate") + 
+  ylab("%") + 
+  geom_smooth(data=average.final, aes(x=enddate, y=average_approve, group=1, colour="Actual Approval")) +
+  geom_smooth(data=average.approve.estimate, aes(x=modeldate, y=average_approve_estimate, group=2, colour="Estiamte Approval")) + 
+  theme(plot.title = element_text(hjust=0.5), axis.title.x=element_blank(), axis.text.x=element_text(angle=180,hjust=1),legend.position=c(0.6,0.9),legend.title=element_blank())
+
+```
+
+- From the chart, we can see the estimate approval rate is fairly close to the actual approval rate.
+
+
+### Subgroup Approval Rate Variation
+
+- It will also be interesting to see the variation of approval rate from each subgroup..
+
+```{r, eval=TRUE}
+
+# Approval rate.
+subgroup.approve <- polls2 %>% 
+  select(subgroup, adjusted_approve) %>% group_by(subgroup)
+
+# Boxplot for each subgroup.
+ggplot(subgroup.approve, aes(x=reorder(factor(subgroup), adjusted_approve, fun=median),y=adjusted_approve,fill=factor(subgroup))) + geom_boxplot() + labs(title="Subgroup Approval Rate Variation") + ylab("%") + theme(legend.position = "none", axis.title.x = element_blank(), axis.text.x=element_text(angle=45)) + theme(plot.title = element_text(hjust=0.5)) + theme(axis.text.x = element_text(margin = margin(t = 25, r = 20, b = 0, l = 0)))
+
+```
+
+- From the boxplot, we can see the variation about the same across the 3 groups.

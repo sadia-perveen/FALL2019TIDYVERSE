@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Zach Alexander" />
+
+<meta name="date" content="2019-11-19" />
+
+<title>DATA 607 - TidyVerse Vignette (tidyr)</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">DATA 607 - TidyVerse Vignette (tidyr)</h1>
+<h4 class="author">Zach Alexander</h4>
+<h4 class="date">November 19, 2019</h4>
+
+
+
+<hr />
+<div id="libraries-loaded" class="section level3">
+<h3>Libraries loaded</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">echo =</span> <span class="ot">TRUE</span>)
+<span class="kw">library</span>(tidyverse)
+<span class="kw">library</span>(tidyr)</code></pre></div>
+<hr />
+</div>
+<div id="loading-in-the-dataset-from-fivethirtyeight" class="section level3">
+<h3>Loading in the dataset from FiveThirtyEight</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nfl_elo &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">'https://raw.githubusercontent.com/zachalexander/FALL2019TIDYVERSE/master/nfl_elo_latest.csv'</span>)</code></pre></div>
+<hr />
+</div>
+<div id="working-with-the-tidyr-package" class="section level3">
+<h3>Working with the tidyr package</h3>
+<p>Most of the time, data and information is not presented in a very easy-to-use format. As data scientists, a key part of our role is to manipulate data into formats that are simpler to understand and to use. Without clean and tidy data, it’s difficult to run analyses and visualize important points in order to draw valuable conclusions. Additionally, the data-tidying process is never static, as new questions arise and/or new data is collected, data need to be cleaned further.</p>
+<p>The tidyr package is a great tool to utilize for these circumstances.</p>
+<p>With built-in functions such as <code>spread()</code>, <code>gather()</code>, <code>separate()</code>, <code>separate_rows()</code>, <code>unite()</code>, <code>drop_na()</code>, <code>fill()</code>, and <code>replace_na()</code>, we can tidy data in many different ways.</p>
+<hr />
+<div id="reshaping-data" class="section level4">
+<h4>Reshaping Data</h4>
+<p>Often times, you’ll need to change the layout of values in a table. Whether you are going from a wide dataset to long dataset, or vice versa, the <code>gather()</code> and <code>spread()</code> functions are very valuable for this process.</p>
+<hr />
+<center>
+<blockquote>
+<p><strong>Gather</strong></p>
+</blockquote>
+</center>
+<p>This function takes the values from the column names, turns them into a “key” column and gathers the values into a single value column.</p>
+<p>As an example, we’ll take a look at the NFL Elo Ratings Dataset from FiveThirtyEight. We’ll select a few columns to simplify the view. Below, is a filtered dataset of Elo Ratings for all home teams for the 2019 season. I have removed games that have not been played yet (elo ratings as of 11/17/2019):</p>
+<pre><code>## # A tibble: 20 x 4
+##    date       team  elo1_pre elo1_post
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    
+##  1 2019-09-08 ARI   1383.740 1385.565 
+##  2 2019-09-22 ARI   1379.762 1353.336 
+##  3 2019-09-29 ARI   1353.336 1336.548 
+##  4 2019-10-13 ARI   1354.952 1362.684 
+##  5 2019-10-31 ARI   1382.397 1375.141 
+##  6 2019-09-15 ATL   1499.424 1516.860 
+##  7 2019-09-29 ATL   1507.661 1474.769 
+##  8 2019-10-20 ATL   1446.419 1417.507 
+##  9 2019-10-27 ATL   1417.507 1401.747 
+## 10 2019-09-15 BAL   1598.558 1604.361 
+## 11 2019-09-29 BAL   1592.051 1544.287 
+## 12 2019-10-13 BAL   1560.892 1566.734 
+## 13 2019-11-03 BAL   1602.365 1637.031 
+## 14 2019-11-17 BAL   1648.927 1670.466 
+## 15 2019-09-22 BUF   1485.887 1494.388 
+## 16 2019-09-29 BUF   1494.388 1482.189 
+## 17 2019-10-20 BUF   1511.859 1520.440 
+## 18 2019-10-27 BUF   1520.440 1485.364 
+## 19 2019-11-03 BUF   1485.364 1497.455 
+## 20 2019-09-08 CAR   1519.379 1506.142</code></pre>
+<p>Now, in order to gather the pre and post elo ratings into one column, we can use the <code>gather()</code> function to do this. As you can see from the output, both elo rating <strong>values</strong> are now gathered into one row, and there is a <strong>key</strong> column of either <em>pre</em> or <em>post</em> elo ratings:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gather &lt;-<span class="st"> </span>home_teams <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">gather</span>(elo1_pre, elo1_post, <span class="dt">key =</span> <span class="st">'pre_post'</span>, <span class="dt">value =</span> <span class="st">'elo_ratings'</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(team, date)</code></pre></div>
+<pre><code>## # A tibble: 20 x 4
+##    date       team  pre_post  elo_ratings
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;      
+##  1 2019-09-08 ARI   elo1_pre  1383.740   
+##  2 2019-09-08 ARI   elo1_post 1385.565   
+##  3 2019-09-22 ARI   elo1_pre  1379.762   
+##  4 2019-09-22 ARI   elo1_post 1353.336   
+##  5 2019-09-29 ARI   elo1_pre  1353.336   
+##  6 2019-09-29 ARI   elo1_post 1336.548   
+##  7 2019-10-13 ARI   elo1_pre  1354.952   
+##  8 2019-10-13 ARI   elo1_post 1362.684   
+##  9 2019-10-31 ARI   elo1_pre  1382.397   
+## 10 2019-10-31 ARI   elo1_post 1375.141   
+## 11 2019-09-15 ATL   elo1_pre  1499.424   
+## 12 2019-09-15 ATL   elo1_post 1516.860   
+## 13 2019-09-29 ATL   elo1_pre  1507.661   
+## 14 2019-09-29 ATL   elo1_post 1474.769   
+## 15 2019-10-20 ATL   elo1_pre  1446.419   
+## 16 2019-10-20 ATL   elo1_post 1417.507   
+## 17 2019-10-27 ATL   elo1_pre  1417.507   
+## 18 2019-10-27 ATL   elo1_post 1401.747   
+## 19 2019-09-15 BAL   elo1_pre  1598.558   
+## 20 2019-09-15 BAL   elo1_post 1604.361</code></pre>
+<hr />
+<center>
+<blockquote>
+<p><strong>Spread</strong></p>
+</blockquote>
+</center>
+<p>In this same fashion, if we’d like to spread the key column back into separate columns, we can use the <code>spread()</code> function to move the unique values of a key into column names. Therefore, to continue our example, we can spread the <em>elo1pre</em> and <em>elo1post</em> values from the <em>eloratings</em> column, into their own columns based on the key values:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">spread &lt;-<span class="st"> </span>gather <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">spread</span>(pre_post, elo_ratings) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(team, date)</code></pre></div>
+<pre><code>## # A tibble: 20 x 4
+##    date       team  elo1_post elo1_pre
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;   
+##  1 2019-09-08 ARI   1385.565  1383.740
+##  2 2019-09-22 ARI   1353.336  1379.762
+##  3 2019-09-29 ARI   1336.548  1353.336
+##  4 2019-10-13 ARI   1362.684  1354.952
+##  5 2019-10-31 ARI   1375.141  1382.397
+##  6 2019-09-15 ATL   1516.860  1499.424
+##  7 2019-09-29 ATL   1474.769  1507.661
+##  8 2019-10-20 ATL   1417.507  1446.419
+##  9 2019-10-27 ATL   1401.747  1417.507
+## 10 2019-09-15 BAL   1604.361  1598.558
+## 11 2019-09-29 BAL   1544.287  1592.051
+## 12 2019-10-13 BAL   1566.734  1560.892
+## 13 2019-11-03 BAL   1637.031  1602.365
+## 14 2019-11-17 BAL   1670.466  1648.927
+## 15 2019-09-22 BUF   1494.388  1485.887
+## 16 2019-09-29 BUF   1482.189  1494.388
+## 17 2019-10-20 BUF   1520.440  1511.859
+## 18 2019-10-27 BUF   1485.364  1520.440
+## 19 2019-11-03 BUF   1497.455  1485.364
+## 20 2019-09-08 CAR   1506.142  1519.379</code></pre>
+<hr />
+<center>
+<blockquote>
+<p><strong>Unite</strong></p>
+</blockquote>
+</center>
+<p>If we’d like to combine the elo ratings, <em>pre</em> and <em>post</em> into one cell and one column per team, we could use the <code>unite()</code> function to do this, with a “/” as a separator:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">unite &lt;-<span class="st"> </span>spread <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">unite</span>(elo1_post, elo1_pre, <span class="dt">col =</span> <span class="st">&quot;elo_ratings&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;/&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(team, date)</code></pre></div>
+<pre><code>## # A tibble: 20 x 3
+##    date       team  elo_ratings      
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;            
+##  1 2019-09-08 ARI   1385.565/1383.740
+##  2 2019-09-22 ARI   1353.336/1379.762
+##  3 2019-09-29 ARI   1336.548/1353.336
+##  4 2019-10-13 ARI   1362.684/1354.952
+##  5 2019-10-31 ARI   1375.141/1382.397
+##  6 2019-09-15 ATL   1516.860/1499.424
+##  7 2019-09-29 ATL   1474.769/1507.661
+##  8 2019-10-20 ATL   1417.507/1446.419
+##  9 2019-10-27 ATL   1401.747/1417.507
+## 10 2019-09-15 BAL   1604.361/1598.558
+## 11 2019-09-29 BAL   1544.287/1592.051
+## 12 2019-10-13 BAL   1566.734/1560.892
+## 13 2019-11-03 BAL   1637.031/1602.365
+## 14 2019-11-17 BAL   1670.466/1648.927
+## 15 2019-09-22 BUF   1494.388/1485.887
+## 16 2019-09-29 BUF   1482.189/1494.388
+## 17 2019-10-20 BUF   1520.440/1511.859
+## 18 2019-10-27 BUF   1485.364/1520.440
+## 19 2019-11-03 BUF   1497.455/1485.364
+## 20 2019-09-08 CAR   1506.142/1519.379</code></pre>
+<hr />
+<center>
+<blockquote>
+<p><strong>Separate</strong></p>
+</blockquote>
+</center>
+<p>Similarly, if we’d like to move these values back out into separate columns, we can use the <code>separate()</code> function to create the <em>pre</em> and <em>post</em> elo rating columns:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">separate &lt;-<span class="st"> </span>unite <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">separate</span>(elo_ratings, <span class="dt">sep =</span> <span class="st">&quot;/&quot;</span>, <span class="dt">into =</span> <span class="kw">c</span>(<span class="st">&quot;elo1_post&quot;</span>, <span class="st">&quot;elo1_pre&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(team, date)</code></pre></div>
+<pre><code>## # A tibble: 20 x 4
+##    date       team  elo1_post elo1_pre
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;   
+##  1 2019-09-08 ARI   1385.565  1383.740
+##  2 2019-09-22 ARI   1353.336  1379.762
+##  3 2019-09-29 ARI   1336.548  1353.336
+##  4 2019-10-13 ARI   1362.684  1354.952
+##  5 2019-10-31 ARI   1375.141  1382.397
+##  6 2019-09-15 ATL   1516.860  1499.424
+##  7 2019-09-29 ATL   1474.769  1507.661
+##  8 2019-10-20 ATL   1417.507  1446.419
+##  9 2019-10-27 ATL   1401.747  1417.507
+## 10 2019-09-15 BAL   1604.361  1598.558
+## 11 2019-09-29 BAL   1544.287  1592.051
+## 12 2019-10-13 BAL   1566.734  1560.892
+## 13 2019-11-03 BAL   1637.031  1602.365
+## 14 2019-11-17 BAL   1670.466  1648.927
+## 15 2019-09-22 BUF   1494.388  1485.887
+## 16 2019-09-29 BUF   1482.189  1494.388
+## 17 2019-10-20 BUF   1520.440  1511.859
+## 18 2019-10-27 BUF   1485.364  1520.440
+## 19 2019-11-03 BUF   1497.455  1485.364
+## 20 2019-09-08 CAR   1506.142  1519.379</code></pre>
+<hr />
+<center>
+<blockquote>
+<p><strong>Separate Rows</strong></p>
+</blockquote>
+</center>
+<p>Another option, rather than separating the values out into unique columns of <em>pre</em> and <em>post</em> elo ratings, is to create one new column with the <em>pre</em> and <em>post</em> ratings per date and team, similar to the <code>gather()</code> function, but without a key column. For this, we can use the <code>separate_rows()</code> function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">separate_rows &lt;-<span class="st"> </span>unite <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">separate_rows</span>(elo_ratings, <span class="dt">sep =</span> <span class="st">&quot;/&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(team, date)</code></pre></div>
+<pre><code>## # A tibble: 20 x 3
+##    date       team  elo_ratings
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;      
+##  1 2019-09-08 ARI   1385.565   
+##  2 2019-09-08 ARI   1383.740   
+##  3 2019-09-22 ARI   1353.336   
+##  4 2019-09-22 ARI   1379.762   
+##  5 2019-09-29 ARI   1336.548   
+##  6 2019-09-29 ARI   1353.336   
+##  7 2019-10-13 ARI   1362.684   
+##  8 2019-10-13 ARI   1354.952   
+##  9 2019-10-31 ARI   1375.141   
+## 10 2019-10-31 ARI   1382.397   
+## 11 2019-09-15 ATL   1516.860   
+## 12 2019-09-15 ATL   1499.424   
+## 13 2019-09-29 ATL   1474.769   
+## 14 2019-09-29 ATL   1507.661   
+## 15 2019-10-20 ATL   1417.507   
+## 16 2019-10-20 ATL   1446.419   
+## 17 2019-10-27 ATL   1401.747   
+## 18 2019-10-27 ATL   1417.507   
+## 19 2019-09-15 BAL   1604.361   
+## 20 2019-09-15 BAL   1598.558</code></pre>
+<hr />
+</div>
+<div id="handling-missing-values" class="section level4">
+<h4>Handling Missing Values</h4>
+<p>Many times, there will be information in a dataset that is missing. Whether this is intentional, or by mistake, we can use a few tidyr functions to clean up these missing values.</p>
+<p>To demonstrate, we’ll extend the example <em>eloratings</em> dataset to include elo ratings for games that have not occurred yet for NFL home teams in the 2019 season.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(home_teams_future, <span class="dt">n =</span> 20L)</code></pre></div>
+<pre><code>## # A tibble: 20 x 4
+##    date       team  elo1_pre elo1_post
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    
+##  1 2019-09-08 ARI   1384     1386     
+##  2 2019-09-22 ARI   1380     1353     
+##  3 2019-09-29 ARI   1353     1337     
+##  4 2019-10-13 ARI   1355     1363     
+##  5 2019-10-31 ARI   1382     1375     
+##  6 2019-12-01 ARI   1360     &lt;NA&gt;     
+##  7 2019-12-08 ARI   1360     &lt;NA&gt;     
+##  8 2019-12-15 ARI   1360     &lt;NA&gt;     
+##  9 2019-09-15 ATL   1499     1517     
+## 10 2019-09-29 ATL   1508     1475     
+## 11 2019-10-20 ATL   1446     1418     
+## 12 2019-10-27 ATL   1418     1402     
+## 13 2019-11-24 ATL   1510     &lt;NA&gt;     
+## 14 2019-11-28 ATL   1510     &lt;NA&gt;     
+## 15 2019-12-08 ATL   1510     &lt;NA&gt;     
+## 16 2019-12-22 ATL   1510     &lt;NA&gt;     
+## 17 2019-09-15 BAL   1599     1604     
+## 18 2019-09-29 BAL   1592     1544     
+## 19 2019-10-13 BAL   1561     1567     
+## 20 2019-11-03 BAL   1602     1637</code></pre>
+<hr />
+<center>
+<blockquote>
+<p><strong>Replace NA</strong></p>
+</blockquote>
+</center>
+<p>In certain instances, it will be necessary to fill in a value for missing values. You can do this easily with the <code>replace_na()</code> function.</p>
+<p>Continuing with our example, we can fill in all missing values (NA), with “Game hasn’t happened yet”, in order to better inform users as to why this data is missing:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">replace_na &lt;-<span class="st"> </span>home_teams_future <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">elo1_post =</span> <span class="st">&quot;Game hasn't happened yet&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(team, date)</code></pre></div>
+<pre><code>## # A tibble: 20 x 4
+##    date       team  elo1_pre elo1_post               
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;                   
+##  1 2019-09-08 ARI   1384     1386                    
+##  2 2019-09-22 ARI   1380     1353                    
+##  3 2019-09-29 ARI   1353     1337                    
+##  4 2019-10-13 ARI   1355     1363                    
+##  5 2019-10-31 ARI   1382     1375                    
+##  6 2019-12-01 ARI   1360     Game hasn't happened yet
+##  7 2019-12-08 ARI   1360     Game hasn't happened yet
+##  8 2019-12-15 ARI   1360     Game hasn't happened yet
+##  9 2019-09-15 ATL   1499     1517                    
+## 10 2019-09-29 ATL   1508     1475                    
+## 11 2019-10-20 ATL   1446     1418                    
+## 12 2019-10-27 ATL   1418     1402                    
+## 13 2019-11-24 ATL   1510     Game hasn't happened yet
+## 14 2019-11-28 ATL   1510     Game hasn't happened yet
+## 15 2019-12-08 ATL   1510     Game hasn't happened yet
+## 16 2019-12-22 ATL   1510     Game hasn't happened yet
+## 17 2019-09-15 BAL   1599     1604                    
+## 18 2019-09-29 BAL   1592     1544                    
+## 19 2019-10-13 BAL   1561     1567                    
+## 20 2019-11-03 BAL   1602     1637</code></pre>
+<hr />
+<center>
+<blockquote>
+<p><strong>Fill NA</strong></p>
+</blockquote>
+</center>
+<p>In some instances, if there are missing values that should be the same value as the most recent non-NA value in the column, you can also use the <code>fill()</code> function to resolve this.</p>
+<p>We will do this with our current example, although it will not reflect accurate information for the future elo ratings:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fill &lt;-<span class="st"> </span>home_teams_future <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">fill</span>(elo1_post) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(team, date)</code></pre></div>
+<pre><code>## # A tibble: 20 x 4
+##    date       team  elo1_pre elo1_post
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    
+##  1 2019-09-08 ARI   1384     1386     
+##  2 2019-09-22 ARI   1380     1353     
+##  3 2019-09-29 ARI   1353     1337     
+##  4 2019-10-13 ARI   1355     1363     
+##  5 2019-10-31 ARI   1382     1375     
+##  6 2019-12-01 ARI   1360     1375     
+##  7 2019-12-08 ARI   1360     1375     
+##  8 2019-12-15 ARI   1360     1375     
+##  9 2019-09-15 ATL   1499     1517     
+## 10 2019-09-29 ATL   1508     1475     
+## 11 2019-10-20 ATL   1446     1418     
+## 12 2019-10-27 ATL   1418     1402     
+## 13 2019-11-24 ATL   1510     1402     
+## 14 2019-11-28 ATL   1510     1402     
+## 15 2019-12-08 ATL   1510     1402     
+## 16 2019-12-22 ATL   1510     1402     
+## 17 2019-09-15 BAL   1599     1604     
+## 18 2019-09-29 BAL   1592     1544     
+## 19 2019-10-13 BAL   1561     1567     
+## 20 2019-11-03 BAL   1602     1637</code></pre>
+<hr />
+<center>
+<blockquote>
+<p><strong>Drop NA</strong></p>
+</blockquote>
+</center>
+<p>Finally, to remove NA values from a column, you can use the <code>drop_na()</code> function to do this in one line of code.</p>
+<p>We will also do this with our current example, reverting this back to our <em>hometeams</em> dataset, which only shows elo ratings for past games for home teams in the 2019 season:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">drop_na &lt;-<span class="st"> </span>home_teams_future <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">drop_na</span>(elo1_post) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(team, date)</code></pre></div>
+<pre><code>## # A tibble: 20 x 4
+##    date       team  elo1_pre elo1_post
+##    &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    
+##  1 2019-09-08 ARI   1384     1386     
+##  2 2019-09-22 ARI   1380     1353     
+##  3 2019-09-29 ARI   1353     1337     
+##  4 2019-10-13 ARI   1355     1363     
+##  5 2019-10-31 ARI   1382     1375     
+##  6 2019-09-15 ATL   1499     1517     
+##  7 2019-09-29 ATL   1508     1475     
+##  8 2019-10-20 ATL   1446     1418     
+##  9 2019-10-27 ATL   1418     1402     
+## 10 2019-09-15 BAL   1599     1604     
+## 11 2019-09-29 BAL   1592     1544     
+## 12 2019-10-13 BAL   1561     1567     
+## 13 2019-11-03 BAL   1602     1637     
+## 14 2019-11-17 BAL   1649     1670     
+## 15 2019-09-22 BUF   1486     1494     
+## 16 2019-09-29 BUF   1494     1482     
+## 17 2019-10-20 BUF   1512     1520     
+## 18 2019-10-27 BUF   1520     1485     
+## 19 2019-11-03 BUF   1485     1497     
+## 20 2019-09-08 CAR   1519     1506</code></pre>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

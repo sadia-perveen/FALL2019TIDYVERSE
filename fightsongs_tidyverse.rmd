@@ -1,0 +1,77 @@
+---
+title: "Tidyverse example"
+author: "Scott Reed"
+date: "11/30/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(purrr)
+```
+
+## Tidyverse Example -- readr - dplyr - purrr - stringr  - Fight Songs
+
+This is a short example to show some tidyverse functionality. We first use readr to grab the FiveThirtyEight fight song database of categorized fight songs, and force it to be a tibble. 
+
+```{r }
+fightSongs<-read_csv(url("https://raw.githubusercontent.com/fivethirtyeight/data/master/fight-songs/fight-songs.csv"))
+```
+
+## Dplyr to clean data
+
+We have some unknowns and those will best be handled by marking those as NA. 
+
+```{r}
+fightSongs<-fightSongs %>% mutate_if(is.character, list(~na_if(., "Unknown")))
+fightSongs$year <- as.numeric(fightSongs$year)
+```
+
+We can then use ggplot and a simple dplyr filter to see a plot of when songs were written
+```{r}
+fightSongs %>% filter(!is.na(year)) %>% ggplot()+geom_bar(aes(year - year %% 10, group=conference, color=conference, fill=conference))
+```
+
+We can also see if names that are longer (using stringr to split on white space, and the "friendly with tidyverse) are more likely to have songs that spell out names. 
+
+```{r}
+fightSongs$nameLength <-unlist( purrr::map(purrr::map(str_split(fightSongs$writers,"\\s"), nchar),max))
+fightSongs  %>% filter(!is.na(nameLength)) %>% ggplot(aes(x=spelling, fill=nameLength>7)) + geom_bar(position="dodge", stat="count")
+```
+
+Well it does seem that there may be more spelling with longer names.
+
+## Summarizing by Duration
+First, we'll take a look at the the average number of seconds per song, grouped by student_writer:
+
+``` {r}
+
+library(tidyverse)
+
+fightSongs %>%
+  group_by(student_writer) %>%
+  summarise(avg_seconds = mean(sec_duration),
+            median_seconds = median(sec_duration),
+            sd_seconds = sd(sec_duration))
+
+boxplot(sec_duration~ student_writer,data = fightSongs)
+
+```
+
+It's a bit hard to see from the boxplot, but we can tell from the summary data that student writers tend to write songs that are around 5 seconds longer than those not written by student writers. 
+
+Next, we'll look at the bpm, also grouped by student_writer:
+``` {r}
+
+fightSongs %>%
+  group_by(student_writer) %>%
+  summarise(avg_bpm = mean(bpm),
+            median_bpm = median(bpm),
+            sd_bpm = sd(bpm))
+
+boxplot(bpm~ student_writer,data = fightSongs)
+
+```
+
+Interestingly, student writers tend to write songs that are slower than non-student writers!

@@ -1,0 +1,106 @@
+---
+title: "Tidyverse Part 2"
+author: "Salma Elshahwy"
+date: "December 1, 2019"
+output: html_document
+---
+### This is extension to C. Rosemond example
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Library
+
+```{r library, message=FALSE}
+library(tidyverse)
+```
+
+## Data Set(s)
+I selected two fivethirtyeight data sets: one that contains current Soccer Power Index (SPI) ratings and rankings for men's club teams and a second that contains match-by-match SPI ratings and forecasts back to 2016.
+
+URL: https://github.com/fivethirtyeight/data/tree/master/soccer-spi
+
+## readr - read_csv()
+The readr package facilitates the reading in of 'rectangular' data like .csv files or other delimited files. Here, I use the read_csv() function to read in two data sets: the global rankings, or 'rankings', and the matches, or 'matches'.
+
+```{r read_csv1, eval=TRUE, message=FALSE}
+rankings <- read_csv('https://projects.fivethirtyeight.com/soccer-api/club/spi_global_rankings.csv')
+matches <- read_csv('https://projects.fivethirtyeight.com/soccer-api/club/spi_matches.csv')
+head(rankings)
+tail(matches)
+```
+
+
+## dplyr - mutate()
+The dplyr package provides a grammar for the manipulation of data--notably, in data frames or tibbles. Here, I use the mutate function to add a new column--a match ID--to the matches tibble.
+
+```{r mutate, eval=TRUE}
+matches <- mutate(matches, match = row_number())
+matches <- matches[,c(23,1:22)]
+head(matches)
+```
+
+
+## dplyr - select()
+The select function from dplyr enables the selection of data frame columns by name or helper function. Here, I select and keep the first six columns ('match' through 'team2') from the matches tibble.
+
+```{r select, eval=TRUE}
+matches <- select(matches, match:team2)
+head(matches)
+```
+
+
+## dplyr - filter()
+The filter function from dplyr enables the subsetting of rows based on specified logical criteria. Here, I select matches that occurred from November 1st through November 7th.
+
+```{r filter, eval=TRUE}
+matches <- filter(matches, date >= '2019-11-01' & date <= '2019-11-07')
+head(matches)
+```
+
+
+## tidyr - gather()
+The tidyr package is designed to facilitate reshaping data. Here, I use the gather() function to reshape the matches tibble from wide to long format, gathering the separate team columns.
+
+```{r gather, eval=TRUE}
+matches <- matches %>% gather(-match, -date, -league_id, -league, key=team_number, value=name) %>% select(-team_number)
+head(matches)
+```
+
+
+## dplyr - arrange()
+The arrange function from dplyr enables the sorting of data based upon column values. Here, I arrange the matches tibble by match number.
+
+```{r arrange, eval=TRUE}
+matches <- arrange(matches, match)
+head(matches)
+```
+
+
+## dplyr - left_join()
+The left_join function works similarly to its SQL counterparts. I finish by using 'name' to merge the matches tibble with the rankings tibble, which contains club rankings and ratings as of November 7th.
+
+```{r left_join, eval=TRUE}
+merged <- dplyr::left_join(matches, rankings, by='name')
+merged <- select(merged, -league.y, - off, -def)
+head(merged)
+```
+
+## tidyverse - ggplot()
+ggplot2 is a system for declaratively creating graphics, based on The Grammar of Graphics. You provide the data, tell ggplot2 
+how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details.
+in this example, I wanted to see the distribution of ranks vs. prev_ranks in different dates.
+
+```{r}
+# we can use ggplot to have a better sense of the analysis
+library(ggplot2)
+ggplot(merged, aes(rank, prev_rank)) + 
+  geom_point() +
+  facet_wrap(~date)
+```
+
+
+
+
+

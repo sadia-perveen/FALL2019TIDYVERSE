@@ -1,0 +1,249 @@
+---
+title: "DATA 607 - TidyVerse Vignette (tidyr)"
+author: "Zach Alexander"
+date: "November 19, 2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+***
+
+### Libraries loaded
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidyr)
+```
+
+
+***
+
+### Loading in the dataset from FiveThirtyEight
+
+```{r, warning=FALSE, message=FALSE}
+nfl_elo <- read_csv('https://raw.githubusercontent.com/zachalexander/FALL2019TIDYVERSE/master/nfl_elo_latest.csv')
+```
+
+***
+
+### Working with the tidyr package
+
+Most of the time, data and information is not presented in a very easy-to-use format. As data scientists, a key part of our role is to manipulate data into formats that are simpler to understand and to use. Without clean and tidy data, it's difficult to run analyses and visualize important points in order to draw valuable conclusions. Additionally, the data-tidying process is never static, as new questions arise and/or new data is collected, data need to be cleaned further.
+
+The tidyr package is a great tool to utilize for these circumstances. 
+
+With built-in functions such as `spread()`, `gather()`, `separate()`, `separate_rows()`, `unite()`, `drop_na()`, `fill()`, and `replace_na()`, we can tidy data in many different ways.
+
+
+***
+
+#### Reshaping Data
+
+Often times, you'll need to change the layout of values in a table. Whether you are going from a wide dataset to long dataset, or vice versa, the `gather()` and `spread()` functions are very valuable for this process.  
+
+***
+
+<center>
+> __Gather__
+</center>  
+
+This function takes the values from the column names, turns them into a "key" column and gathers the values into a single value column.
+
+As an example, we'll take a look at the NFL Elo Ratings Dataset from FiveThirtyEight. We'll select a few columns to simplify the view. Below, is a filtered dataset of Elo Ratings for all home teams for the 2019 season. I have removed games that have not been played yet (elo ratings as of 11/17/2019):
+
+```{r, echo=FALSE}
+home_teams <- nfl_elo %>%
+  gather('x', 'team', 5:6) %>% 
+  select(date, x, team, elo1_pre, elo1_post) %>% 
+  filter(x == 'team1') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  arrange(team) %>% 
+  select(date, team, elo1_pre, elo1_post) %>% 
+  filter(!is.na(elo1_pre) & !is.na(elo1_post)) %>% 
+  mutate(elo1_post = format(elo1_post, na.encode = FALSE), elo1_pre = format(elo1_pre, na.encode = FALSE)) %>% 
+  mutate(elo1_post = format(elo1_post, digits = 0, na.encode = FALSE), elo1_pre = format(elo1_pre, digits = 0, na.encode = FALSE))
+```
+
+```{r, echo=FALSE}
+head(home_teams, n = 20L)
+```
+
+Now, in order to gather the pre and post elo ratings into one column, we can use the `gather()` function to do this. As you can see from the output, both elo rating __values__ are now gathered into one row, and there is a __key__ column of either _pre_ or _post_ elo ratings: 
+
+```{r}
+gather <- home_teams %>% 
+  gather(elo1_pre, elo1_post, key = 'pre_post', value = 'elo_ratings') %>% 
+  arrange(team, date)
+```
+
+```{r, echo=FALSE}
+head(gather, n = 20L)
+```
+
+***
+
+<center>
+> __Spread__
+</center>  
+
+In this same fashion, if we'd like to spread the key column back into separate columns, we can use the `spread()` function to move the unique values of a key into column names. Therefore, to continue our example, we can spread the _elo1pre_ and _elo1post_ values from the _eloratings_ column, into their own columns based on the key values:
+
+
+```{r}
+spread <- gather %>% 
+  spread(pre_post, elo_ratings) %>% 
+  arrange(team, date)
+```
+
+```{r, echo=FALSE}
+head(spread, n = 20L)
+```
+
+
+***
+
+<center>
+> __Unite__
+</center>  
+
+If we'd like to combine the elo ratings, _pre_ and _post_ into one cell and one column per team, we could use the `unite()` function to do this, with a "/" as a separator:
+
+```{r}
+unite <- spread %>% 
+  unite(elo1_post, elo1_pre, col = "elo_ratings", sep = "/") %>% 
+  arrange(team, date)
+```
+
+```{r, echo=FALSE}
+head(unite, n = 20L)
+```
+
+
+***
+
+<center>
+> __Separate__
+</center> 
+
+Similarly, if we'd like to move these values back out into separate columns, we can use the `separate()` function to create the _pre_ and _post_ elo rating columns:
+
+
+```{r}
+separate <- unite %>% 
+  separate(elo_ratings, sep = "/", into = c("elo1_post", "elo1_pre")) %>% 
+  arrange(team, date)
+```
+
+```{r, echo=FALSE}
+head(separate, n = 20L)
+```
+
+***
+
+<center>
+> __Separate Rows__
+</center> 
+
+Another option, rather than separating the values out into unique columns of _pre_ and _post_ elo ratings, is to create one new column with the _pre_ and _post_ ratings per date and team, similar to the `gather()` function, but without a key column. For this, we can use the `separate_rows()` function:
+
+```{r}
+separate_rows <- unite %>% 
+  separate_rows(elo_ratings, sep = "/") %>% 
+  arrange(team, date)
+```
+
+```{r, echo=FALSE}
+head(separate_rows, n = 20L)
+```
+
+***
+
+#### Handling Missing Values
+
+Many times, there will be information in a dataset that is missing. Whether this is intentional, or by mistake, we can use a few tidyr functions to clean up these missing values.  
+
+To demonstrate, we'll extend the example _eloratings_ dataset to include elo ratings for games that have not occurred yet for NFL home teams in the 2019 season.
+
+```{r, echo=FALSE}
+home_teams_future <- nfl_elo %>%
+  gather('x', 'team', 5:6) %>% 
+  select(date, x, team, elo1_pre, elo1_post) %>% 
+  filter(x == 'team1') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  arrange(team) %>% 
+  select(date, team, elo1_pre, elo1_post) %>% 
+  mutate(elo1_post = as.numeric(elo1_post), elo1_pre = as.numeric(elo1_pre)) %>% 
+  mutate(elo1_post = format(elo1_post, digits = 0, na.encode = FALSE), elo1_pre = format(elo1_pre, digits = 0, na.encode = FALSE)) %>% 
+  mutate(elo1_post = str_replace_all(elo1_post, "  NA", "NA")) %>% 
+  mutate(elo1_post = na_if(elo1_post, "NA"))
+```
+
+```{r}
+head(home_teams_future, n = 20L)
+```
+
+***
+
+<center>
+> __Replace NA__
+</center> 
+
+In certain instances, it will be necessary to fill in a value for missing values. You can do this easily with the `replace_na()` function.
+
+Continuing with our example, we can fill in all missing values (NA), with "Game hasn't happened yet", in order to better inform users as to why this data is missing:
+
+```{r}
+replace_na <- home_teams_future %>% 
+  replace_na(list(elo1_post = "Game hasn't happened yet")) %>% 
+  arrange(team, date)
+```
+
+```{r, echo=FALSE}
+head(replace_na, n = 20L)
+```
+
+***
+
+<center>
+> __Fill NA__
+</center> 
+
+In some instances, if there are missing values that should be the same value as the most recent non-NA value in the column, you can also use the `fill()` function to resolve this.
+
+We will do this with our current example, although it will not reflect accurate information for the future elo ratings:
+
+```{r}
+fill <- home_teams_future %>% 
+  fill(elo1_post) %>% 
+  arrange(team, date)
+```
+
+```{r, echo=FALSE}
+head(fill, n = 20L)
+```
+
+***
+
+<center>
+> __Drop NA__
+</center> 
+
+Finally, to remove NA values from a column, you can use the `drop_na()` function to do this in one line of code. 
+
+We will also do this with our current example, reverting this back to our _hometeams_ dataset, which only shows elo ratings for past games for home teams in the 2019 season:
+
+
+```{r}
+drop_na <- home_teams_future %>% 
+  drop_na(elo1_post) %>% 
+  arrange(team, date)
+```
+
+```{r, echo=FALSE}
+head(drop_na, n = 20L)
+```
+
