@@ -1,0 +1,102 @@
+---
+title: "TidyVerse Assignment"
+author: "Shovan Biswas"
+date: "11/27/2019"
+output:
+  pdf_document:
+    number_sections: no
+  prettydoc::html_pretty:
+    pdf_document: default
+    theme: cayman
+  html_document:
+    df_print: paged
+---
+
+The problem statement is as follows:
+
+In this assignment, you’ll practice collaborating around a code project with GitHub.  You could consider our collective work as building out a book of examples on how to use TidyVerse functions.
+
+GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE 
+
+FiveThirtyEight.com datasets.
+
+Kaggle datasets. 
+
+You have two tasks:
+
+Create an Example.  Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
+Extend an Existing Example.  Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+You should clone the provided repository.  Once you have code to submit, you should make a pull request on the shared repository.  Minimally, you should be submitted .Rmd files; ideally, you should also submit an .md file and update the README.md file with your example.
+
+After you’ve completed both parts of the assignment, please submit your GitHub handle name in the submission link provided in the week 1 folder!  This will let your instructor know that your work is ready to be graded.
+
+You should complete both parts of the assignment and make your submission no later than the end of day on Sunday, December 1st.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library('knitr')
+```
+
+## Data Source
+
+https://www.kaggle.com/ronitf/heart-disease-uci
+
+## Load Data
+
+```{r Load Data}
+heart <- read_csv("https://raw.githubusercontent.com/ShovanBiswas/DATA607/master/Week13_TidyVerse/heart.csv")
+kable (head(heart))
+```
+
+## Capability 1.
+
+`do` capability tutorial (do anything)
+
+Description: Performs any arbitrary computations on the data  
+Usage: do(data, …)  
+Example: We can create a function that sorts the data by age then returns the first 5 for each age group.
+
+```{r}
+x = 5
+top <- function(t, x){
+  t %>% arrange(desc(age)) %>% head(x)
+}
+heart %>% group_by(age) %>% do(top(., x))
+```
+
+## Capability 2.
+
+`filter` capability tutorial
+
+Description: Using filter we can select rows of the data frame matching conditions.  
+Usage: filter(data)  
+Example: To select the people of over 20 and less than 65 we can pass the data heart and condtion age>20 and age < 65 to the function . It’ll return matching rows of heart disease.  
+
+```{r}
+filter(heart, age>20 & age < 65)
+```
+
+## Capability 3.
+
+`select` capability tutorial
+
+Description: Using select we can keep the selected variables  
+Usage: select(data, …)  
+Example: To keep only age, sex,cp variable we can pass the data heart and age, sex,cp to the function .
+
+```{r}
+df<- select(heart, c("age","sex","cp"))
+head(df)
+```
+
+##  Capability 4.
+
+`arrange` capability tutorial
+Description: Using arrange we can order the rows in an expression involving variables  
+Usage: arrange(data, …)  
+Example: To arrange the rows by sex and age
+
+```{r}
+df <- df %>% arrange(sex, age)
+head(df)
+```
