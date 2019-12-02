@@ -1,0 +1,83 @@
+---
+title: "TidyVerse Assignment"
+author: "Samuel I Kigamba"
+date: "December 1, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+TidyVerse assignment, due 12/01, accepted until 12/08
+In this assignment, you’ll practice collaborating around a code project with GitHub.  You could consider our collective work as building out a book of examples on how to use TidyVerse functions.
+
+GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE 
+
+FiveThirtyEight.com datasets.
+
+Kaggle datasets. 
+
+You have two tasks:
+
+Create an Example.  Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
+Extend an Existing Example.  Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+You should clone the provided repository.  Once you have code to submit, you should make a pull request on the shared repository.  Minimally, you should be submitted .Rmd files; ideally, you should also submit an .md file and update the README.md file with your example.
+
+After you’ve completed both parts of the assignment, please submit your GitHub handle name in the submission link provided in the week 1 folder!  This will let your instructor know that your work is ready to be graded.
+
+You should complete both parts of the assignment and make your submission no later than the end of day on Sunday, December 1st.
+
+
+
+```{r, message=FALSE, warning=FALSE}
+library(stringr)
+library(tidyr)
+library(dplyr)
+library(tidyverse)
+```
+
+
+# Data Source.
+
+FiveThirtyEight.com datasets (https://data.fivethirtyeight.com/)
+
+#Load Data directly from FiveThirtyEight.com
+
+```{r, message=FALSE, warning=FALSE}
+
+polls <- read_csv("https://projects.fivethirtyeight.com/polls-page/president_primary_polls.csv")
+
+head(polls) #Print out first 5 rows to confirm that the data have been loaded correctly.
+
+```
+
+
+
+#Rename third and fourth columns using the rename() function.
+```{r}
+polls <- dplyr::rename(polls, cycle_year = cycle)
+polls <- dplyr::rename(polls, state_name = state)
+
+names(polls) #Column names after renaming the third and fourth columns.
+```
+
+
+Use the slice() function to select a few rows for example row 10 to row 15.
+```{r}
+polls_sliced <- polls %>% slice(c(10:15))
+head(polls_sliced)
+```
+
+Use the groupby() function to group by category member and tally
+```{r}
+polls_tally <- polls %>% group_by(answer) %>% tally()
+polls_tally
+
+```
+
+use the function glimpse() to view all the columns of the resulting data frame.
+```{r}
+dplyr::glimpse(polls_tally) 
+```
+```
