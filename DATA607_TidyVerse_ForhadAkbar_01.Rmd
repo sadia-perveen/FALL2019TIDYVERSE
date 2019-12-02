@@ -1,0 +1,107 @@
+---
+title: "TidyVerse Assignment Part 01"
+author: "Forhad Akbar"
+date: "11/27/2019"
+output:
+  prettydoc::html_pretty:
+    pdf_document: default
+    theme: cayman
+  pdf_document:
+    number_sections: no
+  html_document:
+    df_print: paged
+---
+
+The problem statement is as follows:
+
+In this assignment, you’ll practice collaborating around a code project with GitHub.  You could consider our collective work as building out a book of examples on how to use TidyVerse functions.
+
+GitHub repository:  https://github.com/acatlin/FALL2019TIDYVERSE 
+
+FiveThirtyEight.com datasets.
+
+Kaggle datasets. 
+
+You have two tasks:
+
+Create an Example.  Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
+Extend an Existing Example.  Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+You should clone the provided repository.  Once you have code to submit, you should make a pull request on the shared repository.  Minimally, you should be submitted .Rmd files; ideally, you should also submit an .md file and update the README.md file with your example.
+
+After you’ve completed both parts of the assignment, please submit your GitHub handle name in the submission link provided in the week 1 folder!  This will let your instructor know that your work is ready to be graded.
+
+You should complete both parts of the assignment and make your submission no later than the end of day on Sunday, December 1st.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library('knitr')
+```
+
+## Data Source
+
+https://www.kaggle.com/ronitf/heart-disease-uci
+
+## Load Data
+
+```{r Load Data}
+heart <- read_csv("https://raw.githubusercontent.com/forhadakbar/data607fall2019/master/Week%2014/heart.csv")
+kable (head(heart))
+```
+
+## Capability 1.
+
+`slice` capability tutorial
+
+Description: Using slice we can select rows by specifying the row number.  
+Usage: slice(data, …)  
+Example: To select rows 6 to 12
+
+
+```{r}
+slice(heart, 6:12)
+```
+
+OR
+
+To select rows 10 to 15, 18 and 299 to 302
+
+```{r}
+heart %>% slice(c(10:15, 18, 299:302))
+```
+
+## Capability 2.
+
+`mutate` capability tutorial
+
+Description: Creates new columns based on existing ones  
+Usage: mutate(.data, …)  
+Example: Let’s look at a ratio of resting blood pressure to cholesterol under a new column name “Ratio”
+
+```{r}
+#Ratio = trestbps/chol
+heart %>% select(trestbps, chol) %>% mutate(Ratio = trestbps/chol)
+```
+
+## Capability 3.
+
+`summarise` capability tutorial
+
+Description: Applies functions that return results of length 1. Can perform multiple calculations in the same call.  
+Usage: summarise(data, …)  
+Example: Lets see mean and median cholesterol along with mean and median maximum heart rate achieved.
+
+```{r}
+heart %>% summarise(Avg_cholesteral = mean(chol), Median_cholesteral = median(chol), Avg_heartrate = mean(thalach), Median_heartrate = median(thalach))
+```
+
+## Capability 4.
+
+`group_by` capability tutorial with tally
+
+Description: Using group_by and tally we can find count of category member  
+Usage: group_by(data, …)  
+Example: Find the count by sex
+
+```{r}
+heart %>% group_by(sex) %>% tally()
+```
