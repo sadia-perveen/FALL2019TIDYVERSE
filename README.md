@@ -121,4 +121,18 @@ Author: Amber Ferger
 
 * Part 1: I decided to use the dataset that corresponds to the What Do Men Think It Means To Be A Man? article on FiveThirtyEight.com. The article can be found here: https://fivethirtyeight.com/features/what-do-men-think-it-means-to-be-a-man/. This project focuses on the tibble, dplyr, and ggplot 2 packages. I focus on aggregating the data and displaying differences in responses between 2 demographic features. The final markdown file can be found here: http://rpubs.com/amberferger/DATA607_Tidyverse
 
-* Part 2: I extended the Fight Songs vignette by Scott Reed to include additional aggregations. 
+* Part 2: I extended the Fight Songs vignette by Scott Reed to include additional aggregations.
+
+## Kaggle TidyVerse Vignette
+Author: Forhad Akbar
+Part 01: 
+* GitHub handle: https://github.com/forhadakbar
+* Data Source: https://www.kaggle.com/ronitf/heart-disease-uci/version/1
+* slice() to filter out everything except a specified subset of the data.
+* mutate() to add new variables that are functions of existing variables.
+* summarise() to condense multiple values to a single value.
+* group_by() Groups data by specified columns
+
+Part 02: Tidyverse Assignment Part 02 Extended from SHaslett-607-Tidyverse-assignment.Rmd
+* Added group_by()
+* Added ggplot()
