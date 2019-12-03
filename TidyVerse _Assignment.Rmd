@@ -1,5 +1,5 @@
 ---
-title: "TidyVerse_Assignment"
+title: "TidyVerse_Assignment-Women World Cup 2019 Prediction"
 author: "Don Padmaperuma (Geeth)"
 date: "10/13/2019"
 output: 
@@ -146,5 +146,3 @@ heatmap <- ggplot(only_scores, mapping = aes(x = team2, y = team1, fill = spi_co
   theme (axis.text.x = element_text(angle = 60, hjust = 1))
 ggplotly(heatmap)
 ```
-
-
