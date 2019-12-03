@@ -1,0 +1,223 @@
+---
+title: "Tidyverse"
+author: "Mengqin Cai"
+date: "12/1/2019"
+output:
+  md_document:
+    variant: markdown_github
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_collapsed: yes
+    toc_float: yes
+  pdf_document:
+    extra_dependencies:
+    - geometry
+    - multicol
+    - multirow
+  word_document:
+    toc: yes
+theme: lumen
+number_sections: yes
+toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section I
+
+Create an Example.  Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. 
+ 
+
+Data source: https://www.kaggle.com/spscientist/students-performance-in-exams
+
+
+```{r}
+
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(purrr)
+```
+
+# Importing Data
+
+**Readr: The goal of 'readr' is to provide a fast and friendly way to read
+rectangular data (like 'csv', 'tsv', and 'fwf').**
+
+We use readr to read csv into R.
+```{r}
+Students<-read.csv('https://raw.githubusercontent.com/DaisyCai2019/Homework/master/StudentsPerformance.csv')
+head(Students)
+
+name<-c("Gender","Race","Parent_Eduction","Lunch","Test_preparation_course", "math", "reading", "writing")
+colnames(Students) <- name
+head(Students)
+
+```
+
+# Data Summary
+
+Purrr: The purrr package in R provides a complete toolkit for enhancing R’s functional programming. summary() function gives us the descriptive statistics for each column.An even better way to just deduce the mean value, without using any ugly loops, is to use the “map” function.
+
+**map():The map functions transform their input by applying a function to each element and returning a vector the same length as the input.**
+
+map_dbl()calculate the average score for each column and only the numeric column will show the final result.
+
+```{r}
+summary(Students)
+map_dbl(Students,~mean(.x))
+
+```
+
+# Data Wrangling
+
+## tidyr
+
+The tidyr package complements dplyr perfectly. It boosts the power of dplyr for data manipulation and pre-processing. 
+
+**gather():Gather takes multiple columns and collapses into key-value pairs, duplicating all other columns as needed. You use gather() when you notice that you have columns that are not variables.**
+
+We use gather()to gather columns math, writing, reading and writing into rows
+
+```{r}
+
+Students<-gather(Students,"Subject","Score",6:8)
+Students
+
+```
+
+
+## dplyr
+
+dplyr is a grammar of data manipulation, providing a consistent set of verbs that help you solve the most common data manipulation challenges
+
+**filter（）：Use filter() find rows/cases where conditions are true. **
+
+We use filter to show the result of math.
+
+```{r}
+
+Math_Score<-filter(Students,Subject=="math")
+Math_Score
+
+```
+
+**mutate（）：Add new variables and preserves existing; transmute drops existing variables.**
+
+```{r}
+
+Students2<-Students%>%
+ 
+  group_by(Parent_Eduction)%>%
+  mutate(mean=mean(Score))%>%
+  arrange(mean)
+  Students2
+
+```
+
+
+**summarise():It is typically used on grouped data created by group_by(). The output will have one row for each group.**
+
+```{r}
+Students3<-Students%>%
+ 
+  group_by(Gender,Subject)%>%
+  summarise(mean=round(mean(Score),3))%>%
+  arrange(Gender)
+  Students3
+
+```
+
+# Data visualization
+
+ggplot2 is a system for declaratively creating graphics, based on The Grammar of Graphics. You provide the data, tell ggplot2 how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details.
+
+
+```{r}
+
+ ggplot(Students2, aes(reorder(Parent_Eduction,mean), y=mean, fill=Parent_Eduction)) +
+    geom_bar(stat="identity", position=position_dodge(), colour="black", width = 0.5) +
+    coord_flip() + 
+    ggtitle("Parent Eduction and Math Score") +
+    xlab("Eduction") + ylab("Mean") 
+
+
+```
+
+
+
+```{r}
+ggplot(data = Students3, aes(x=Subject,y=mean))+
+  geom_bar(stat = 'identity',aes(fill=Subject))+
+  geom_text(aes(x = Subject, y = mean, 
+                label = paste(mean),
+                group = Subject,
+                vjust = -0.01)) +
+  labs(title = "Different Subjects with Mean Scores", 
+       x = "Subject", 
+       y = "Mean Score") +
+  facet_wrap(~Gender, ncol = 8)+
+  theme_bw()
+```
+
+
+# Section II
+  
+Extend an Existing Example.  Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code.
+
+I extend the example of Amber Ferger.
+
+gitHub: https://github.com/acatlin/FALL2019TIDYVERSE/blob/master/Data%20607%20TidyVerse%20Assignment%20Part%201.Rmd
+
+
+## Load data
+
+Load data from gitHub.
+```{r}
+dat <- as_tibble(read.csv('https://raw.githubusercontent.com/amberferger/DATA607_Masculinity/master/raw-responses.csv'))
+dat
+```
+
+## Data Wrangling
+
+Select the data we need and rename the column.
+
+```{r}
+dat2<-dat%>%
+  select(q0018,q0030,q0034,race2,educ3)
+
+name<-c("Pay_On_A_Date","State","Salary","Race","Education")
+colnames(dat2)<-name
+dat2
+```
+
+
+Filter the NA and choose the pay status as always.
+
+```{r}
+
+dat3<-dat2%>%
+  group_by(Pay_On_A_Date,Salary)%>%
+  filter(Pay_On_A_Date=="Always"& Salary!="NA")%>%
+  count %>%
+  arrange(desc(n))
+dat3
+
+```
+
+##  Data visualization
+
+```{r}
+
+ggplot(dat3, aes(reorder(Salary,n), y=n, fill=Salary)) +
+    geom_bar(stat="identity", position=position_dodge(), colour="black", width = 0.5) +
+    coord_flip() + 
+    ggtitle("Salary Distribution about Men who always pay for their Date") +
+    xlab("Salary") + ylab("Number") 
+
+
+```
