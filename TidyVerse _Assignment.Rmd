@@ -1,0 +1,148 @@
+---
+title: "TidyVerse_Assignment-Women World Cup 2019 Prediction"
+author: "Don Padmaperuma (Geeth)"
+date: "10/13/2019"
+output: 
+  html_document:
+    toc: True
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(plotly)
+```
+
+## Assignment  
+
+For this assignment I am using Women World Cup 2019 Prediction data set that I retrieved from [Fivethirtyeight](https://data.fivethirtyeight.com/) site to create a programming sample "vignette" that demonstrate how to use few of the main capabilities of the selected tidyverse package. 
+
+### Introduction
+
+This dataset shows the chance that each team will win, lose or tie every one of its matches. One important thing that this dataset include is the **SPI rating**, Soccer Power Index, how we turn those ratings into a forecast and how we calculate our in-game win probabilities.  
+To generate our SPI ratings, we run through every past match in our database of women’s international matches — back to 1971 — evaluating the performance of both teams with four metrics:
+
+1. The number of goals they scored.
+2. The number of goals they scored, adjusted to account for red cards and the time and score of the match when each goal was scored.
+3. The number of goals they were expected to score given the shots they took.
+4. The number of goals they were expected to score given the nonshooting actions they took near the opposing team’s goal.
+
+
+### Read .csv file  
+
+```{r}
+women_worldcup <- read_csv("https://projects.fivethirtyeight.com/soccer-api/international/2019/wwc_matches.csv")
+```
+  
+```{r}
+head(women_worldcup)
+```
+
+### Data transformation with dplyr  
+
+In this section I will be using slice(), filter(), summerise(), count() functions that can be found under dplyr.  
+
+#### Manipulate Cases
+
+**Using slice option we can select the row numbers we want to display**  
+
+```{r}
+slice(women_worldcup, 10:20)
+```
+**filter function to extract rows that meet logical criteria**  
+
+```{r}
+filter(women_worldcup, women_worldcup$score1 > "3")
+```
+
+### Summarize Cases
+
+**apply summarize function to columns to create new table of summary statistics**  
+
+```{r}
+women_worldcup %>% summarise(Avg_proj_score1 = mean(proj_score1), Median_proj_score1 = median(proj_score1), Avg_score1 = mean(score1), Median_score1 = median(score1))
+```
+
+**count number of rows each group defined by the variable**  
+
+```{r}
+#Team 1
+count(women_worldcup, women_worldcup$team1, sort = TRUE)
+```
+
+```{r}
+#Team 2
+count(women_worldcup, women_worldcup$team2, sort = TRUE)
+```
+
+### Data Wrangling with tidyr
+
+Under tidyr, There are four fundamental functions of data tyding.     
+1. gather() takes multiple columns, and gathers them into key-value pairs: it makes “wide” data longer
+2. spread() takes two columns (key & value) and spreads in to multiple columns, it makes “long” data wider
+3. separate() splits a single column into multiple columns
+4. unite() combines multiple columns into a single column
+
+#### Reshaping data
+
+Creating a new data set with selected columns. Then gather some columns.   
+
+```{r}
+#Eliminating few columns from the original data set and creating a new data set. 
+wwc_19 <- select(women_worldcup, -c(date, league_id, league, xg1, xg2, nsxg1, nsxg2, prob1, prob2, probtie))
+```
+
+```{r}
+df <- wwc_19 %>%
+  gather(Teams, team_names, team1:team2)
+df
+```
+
+I am going to create a new two columns by combining scores and spi rank.  This new data set will help me for my data visualization part as well.  
+
+```{r}
+only_scores <- wwc_19 %>%
+  unite(score_comb, score1, score2, sep = "-") %>%
+  unite(spi_comb, spi1, spi2, sep = "-")
+only_scores
+```
+
+### Data Visualization - heatmaps  
+
+I am using ggplot function to show a heatmap like plot. 
+
+#### Visualization of scores    
+
+```{r}
+#Graph to show the scores  
+
+g <- ggplot(wwc_19, aes(x = team1, y = team2, fill = score1-score2)) +
+  geom_label(aes(label = paste(score1, score2, sep = "-")), fill = "white") +
+  scale_x_discrete(limits = levels(wwc_19$team1), position = "bottom") +
+  scale_y_discrete(limits = rev(levels(wwc_19$team2))) +
+  theme (axis.text.x = element_text(angle = 60, hjust = 1))
+
+g
+```  
+
+```{r}
+only_scores <- wwc_19 %>%
+  unite(score_comb, score1, score2, sep = "-") %>%
+  unite(spi_comb, spi1, spi2, sep = "-")
+
+heatmap <- ggplot(only_scores, mapping = aes(x = team2, y = team1, fill = score_comb))+
+  geom_tile()+
+  theme (axis.text.x = element_text(angle = 60, hjust = 1))
+ggplotly(heatmap)
+```
+
+#### Visualization of SPI (Soccer Power Index) Rating  
+
+
+```{r}
+heatmap <- ggplot(only_scores, mapping = aes(x = team2, y = team1, fill = spi_comb))+
+  geom_tile()+
+  theme (axis.text.x = element_text(angle = 60, hjust = 1))
+ggplotly(heatmap)
+```
