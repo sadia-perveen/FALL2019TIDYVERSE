@@ -197,13 +197,16 @@ Author: Fan Xu
 
 * Part 2: I extended C. Rosemond's example, utilizing some tidyr and dplyr functions to manipulate the Soccer Power Index data he provided and creating a ggplot.
   * You can find this here: [http://rpubs.com/oggyluky11/555371]
-  
-  
-  ### Kaggle Student Performace Dataset
-Author: Mengqin Cai
 
+
+### Kaggle Student Performace Dataset
+
+Author: Mengqin Cai
 Part1: Use readr(),map(), gather(),filter（）,mutate（）and summarise() to import the data and compare students math performance base on their parents education. ggplot2 to visualize the data.
 
-Part2: Extend Amber Ferger's example, and use arrange()and ggplot2 to show the filtered dataset.
+Part2: Extend Amber Ferger's example, use arrange(), and ggplot2 to show the filtered dataset.
 
 Rpubs: http://rpubs.com/DaisyCai/data607_Tidyverse
+Github:https://github.com/DaisyCai2019/Homework/blob/master/data607_tidyverse.Rmd
+       https://github.com/DaisyCai2019/Homework/blob/master/data607_tidyverse.md
+       
