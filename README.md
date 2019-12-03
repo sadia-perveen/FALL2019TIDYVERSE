@@ -161,8 +161,12 @@ Part 02: Tidyverse Assignment Part 02 extended from 'purrr - Euclid Zhang.RMD'
 * Added ggplot()
 
 ### Kaggle Student Performace Dataset
+
 Author: Mengqin Cai
 Part1: Use readr(),map(), gather(),filter（）,mutate（）and summarise() to import the data and compare students math performance base on their parents education. ggplot2 to visualize the data.
-Rpubs: http://rpubs.com/DaisyCai/data607_Tidyverse
 
-Part2: Extend Amber Ferger's example, use arrange(), and ggplot2 to show the filter dataset.
+Part2: Extend Amber Ferger's example, use arrange(), and ggplot2 to show the filtered dataset.
+
+Rpubs: http://rpubs.com/DaisyCai/data607_Tidyverse
+Github:https://github.com/DaisyCai2019/Homework/blob/master/data607_tidyverse.Rmd
+       https://github.com/DaisyCai2019/Homework/blob/master/data607_tidyverse.md
