@@ -209,4 +209,11 @@ Part2: Extend Amber Ferger's example, use arrange(), and ggplot2 to show the fil
 Rpubs: http://rpubs.com/DaisyCai/data607_Tidyverse
 Github:https://github.com/DaisyCai2019/Homework/blob/master/data607_tidyverse.Rmd
        https://github.com/DaisyCai2019/Homework/blob/master/data607_tidyverse.md
+
+### Kaggle Avocado Price Dataset
+
+Author: Zhi Ying Chen
+Part1: Use filter(), arrange(), select(), rename（）,mutate（）and summaries() to import and analyze the data and useggplot2 to visualize the data.
+Part2: Extend Lin Li's example, use select(), filter(), and summaries to show the filtered dataset.
+
        
