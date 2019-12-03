@@ -1,0 +1,164 @@
+---
+title: "Tidyverse"
+author: "Farhana Zahir"
+date: "12/2/2019"
+output: 
+  html_document:
+    toc:   true
+    toc_float:  true
+---
+
+### Task 
+
+Create an Example Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
+
+Extend an Existing Example Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+
+### Loading the libraries
+
+The Tidyverse is a coherent system of packages that share a common design philosophy for data manipulation, exploration and visualization. For this assignment, we have used the following tools
+
+readr for data import
+dplyr to clean up
+ggplot2 to visualize
+
+```{r message=FALSE}
+library("tidyverse")
+```
+
+### Analysis of suicide rates
+
+The source of the data is Kaggle at https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016.
+The data contains numbers about suicides all over the world from 1985 to 2016. Some of the headers are Country, Year, Age, Sex, suicides per 100k of population, GDP and generation.
+
+The questions we will be answering are:
+
+1) What are the 10 countries with highest rates of male suicides?
+
+2) What are the 10 countries with highest rates of female suicides?
+
+3) Distribution of suicide rates globally (limited to data available in the database)
+
+### Reading the csv
+
+We will be using the read.csv from readr to import the raw csv file into R.
+The file has 27,820 observations of 12 variables. The names of the headers are shown below:
+```{r}
+data<-read.csv("https://raw.githubusercontent.com/zahirf/Data607/master/Suicides.csv", sep=",", header=TRUE)
+```
+
+```{r}
+names(data)
+```
+
+### Cleaning the data
+
+Change names of headers
+
+We want to give more representative names to the headers, so the first thing we do is change those.
+
+```{r}
+names(data)<-c("Country", "Year", "Gender", "Age", "Suicideno", "Population", "Suicidesper100k", "CountryYear", "HDI", "GDP", "GDPpercap", "Generation")
+```
+
+Use filter to get 2014 data
+
+We are only interested in the year 2014 for this assignment, so we will use filer from dplyr to make a subset called data2014. Althought the latest year is 2016, it does not have any data for a few columns so we chose the 2014 for this assignment which has the most complete data.We are making a new dataframe because the original file is more tha 3MB and analysis will take more time.
+
+```{r}
+data2014<-data%>%
+  filter(Year==2014)
+```
+
+We are dropping all columns which we will not be using for your analysis.
+
+```{r}
+data2014<-data2014[, -8]
+data2014<-data2014[, -2]
+data2014<-data2014[,-c(3:5)]
+data2014<-data2014[, -7]
+```
+
+LEt us check for NA values for our main column of interest, suicides per 100k of population.We see that there are no NAs in that column.We also check the HDI column and find the rows that have NAS in them. We replace the NA values by searching the web for the correct values and replacing the NAS
+```{r}
+which(is.na(data2014$Suicidesper100k))
+which(is.na(data2014$HDI))
+#Replacing the NAs
+data2014<-data2014 %>%
+  mutate(HDI = ifelse(Country == "Puerto Rico", 0.845, HDI))
+data2014<-data2014 %>%
+  mutate(HDI = ifelse(Country == "Republic of Korea", 0.903, HDI))
+data2014<-data2014 %>%
+  mutate(HDI = ifelse(Country == "Russian Federation", 0.816, HDI))
+
+```
+
+Convert the data to long
+
+
+```{r}
+data_long <- gather(data2014, factor, measurement, 3:6, factor_key=TRUE)
+glimpse(data_long)
+data_long$factor<-as.character(data_long$factor)
+data_long$measurement<-as.numeric(data_long$measurement)
+```
+
+### Summarizing the data
+
+We want to see the total number of suicides in each country by gender
+
+WE will first summarize our data by gender before we convert
+
+```{r}
+Gender<-data_long%>%
+  filter(factor=='Suicidesper100k')%>%
+  group_by(Country, Gender)%>%
+  summarize(measurement=sum(measurement))
+```
+
+Let us now see which countries have the highest number of suicides for males
+```{r}
+Male<-Gender%>%
+  filter(Gender=='male')%>%
+  group_by(Country)%>%
+  summarize(total=sum(measurement))%>%
+  top_n(10, total)%>%
+  arrange(desc(total))
+
+ggplot(Male, aes(Country, total))+
+geom_bar(stat='identity')
+```
+
+LEt us look at the countries with highest rates of female suicides
+
+```{r}
+Female<-Gender%>%
+  filter(Gender=='female')%>%
+  group_by(Country)%>%
+  summarize(total=sum(measurement))%>%
+  top_n(10, total)%>%
+  arrange(desc(total))
+
+ggplot(Female, aes(Country, total))+
+geom_bar(stat='identity')
+```
+
+LAstly, let us look at the world distribution of suicide rates.
+
+```{r}
+Gender1<-Gender%>%
+  group_by(Country)%>%
+  summarize(measurement=sum(measurement))
+
+world_map <- map_data("world")
+names(Gender1)[1]="region"
+map <- left_join(world_map, Gender1, by = "region")
+
+
+ggplot(map, aes(map_id = region, fill = measurement))+
+  geom_map(map = map,  color = "white")+
+  expand_limits(x = map$long, y = map$lat)+
+  ggtitle("Worldwide Suicides per 100k of population")
+
+
+```

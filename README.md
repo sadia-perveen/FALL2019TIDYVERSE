@@ -28,6 +28,17 @@ You should complete both parts of the assignment and make your submission no lat
 * FiveThirtyEight.com datasets:  https://data.fivethirtyeight.com/
 * Kaggle datasets:  https://www.kaggle.com/datasets
 
+
+
+## Vignettes:
+Author: Mario Pena
+
+**Part 1**: Created a .Rmd document to demonstrate how to use some of the TidyVerse functions such as select(), mutate(), count() and ggplot(). 
+Rpubs: http://rpubs.com/marioipena/553779
+
+**Part 2**: Made an extension to the work of C. Rosemond to add a few more examples with the functions count() and ggplot().
+Github: https://github.com/chrosemo/FALL2019TIDYVERSE/pull/1/commits/7eb56a3490d59ef5ca4f29aaacea6b5c9ed4822f
+=======
 =======
   * You can find this here: 
   
@@ -137,7 +148,7 @@ Part 02: Tidyverse Assignment Part 02 Extended from SHaslett-607-Tidyverse-assig
 * Added group_by()
 * Added ggplot()
 
-Kaggle TidyVerse Vignette
+## Kaggle TidyVerse Vignette
 Author: Shovan Biswas Part 01:
 
 The **dplyr** package makes these steps fast and easy:
@@ -160,6 +171,34 @@ Part 02: Tidyverse Assignment Part 02 extended from 'purrr - Euclid Zhang.RMD'
 * Added top_n()
 * Added ggplot()
 
+## FiveThirtyEight TidyVerse Data Source: president_primary_polls
+Author: Samuel Kigamba
+Data selected: https://projects.fivethirtyeight.com/polls-page/president_primary_polls.csv 
+Github repository: https://github.com/igukusamuel/FALL2019TIDYVERSE/edit/master/README.md
+
+Section 1
+Load DAta
+rename()
+slice()
+groupby()
+tally()
+glimpse()
+
+Section 2
+Extended: https://github.com/forhadakbar/FALL2019TIDYVERSE/blob/master/DATA607_TidyVerse_ForhadAkbar_01.Rmd
+rename() function
+
+
+## TidyVerse Vignette - Kaggle
+Author: Fan Xu
+
+* Part 1: I will be making a TidyVerse vignette for some handly functions in the tidyverse package, using the [London bike sharing dataset](https://www.kaggle.com/hmavrodiev/london-bike-sharing-dataset/data) from <https://www.kaggle.com/datasets>;.
+  * You can find this here: [http://rpubs.com/oggyluky11/555248]
+
+* Part 2: I extended C. Rosemond's example, utilizing some tidyr and dplyr functions to manipulate the Soccer Power Index data he provided and creating a ggplot.
+  * You can find this here: [http://rpubs.com/oggyluky11/555371]
+
+
 ### Kaggle Student Performace Dataset
 
 Author: Mengqin Cai
@@ -170,3 +209,4 @@ Part2: Extend Amber Ferger's example, use arrange(), and ggplot2 to show the fil
 Rpubs: http://rpubs.com/DaisyCai/data607_Tidyverse
 Github:https://github.com/DaisyCai2019/Homework/blob/master/data607_tidyverse.Rmd
        https://github.com/DaisyCai2019/Homework/blob/master/data607_tidyverse.md
+       

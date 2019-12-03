@@ -105,3 +105,14 @@ Example: Find the count by sex
 ```{r}
 heart %>% group_by(sex) %>% tally()
 ```
+## Capability 5.
+
+`rename` capability
+
+Description: Using rename function without changing the content of the data frame  
+Rename column sex to M_F
+Note this only affects the new dataframe - heart_new
+```{r}
+heart_new <- dplyr::rename(heart, M_F = sex)
+names(heart_new)
+```

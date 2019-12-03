@@ -1,0 +1,104 @@
+---
+title: "CUNY SPS - Master of Science in Data Science - DATA607"
+author: "Mario Pena"
+date: "December 01, 2019"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## TidyVerse Assignment: Collaborating Around a Code Project with GitHub.
+
+
+**Assignment Description: In this assignment we will get to practice collaborating around a code project with GitHub. We will create and example using one or more TidyVerse packages and demonstrate how to use the capabilities. We will also extend an existing example from one of our classmate's code with additional annotated code.**
+
+
+## Load Data
+
+We will use a college majors dataset from 'fivethirtyeight.com' and we will load it from their GitHub repository:
+
+```{r}
+# load data
+all_ages <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/all-ages.csv", header = TRUE)
+```
+
+
+## View the Data
+
+Let's view the dataset before we start transforming it:
+
+```{r}
+head(all_ages)
+```
+
+Now, I will transform the dataset by using functions from the dplyr and ggplot package:
+
+
+## dplyr::select()
+
+### Usage: select(data, ...)
+
+**Extract columns as a table. Also select_if().** *select(iris, Sepa.Length, Species)*
+    
+**Example**
+
+I will extract 7 of the 11 original columns from the dataset:
+
+```{r}
+library(tidyverse)
+all <- select(all_ages, Major_code, Major, Major_category, Employed, Unemployed, Unemployment_rate, Median)
+head(all)
+```
+
+
+## dplyr::mutate()
+
+### Usage: mutate(data, ...)
+
+**Compute new column(s). Take vectors as input and return vectors of the same length as output.** *mutate(tcars, gpm_2/mpg)*
+    
+**Example**
+
+With this function I create a new column (Employment_rate), which is calculated dividing employed by employed plus unemployed:
+
+```{r}
+all <- mutate(all, Employment_rate=Employed/(Employed+Unemployed))
+head(all)
+```
+
+
+## dplyr::count()
+
+### Usage: count(x, ..., wt = NULL, sort = FALSE)
+
+**Count number of rows in each group defined by the variables in... Also tally()**. *count(Iris, Species)*
+    
+**Example**
+
+This function will help me count how many majors there are in each major category:
+
+```{r}
+all_count <- count(all, Major_category)
+all_count
+```
+
+
+## ggplot2::ggplot()
+
+### Usage: ggplot(data = DATA) + GEOM_FUNCTION(mapping = aes (MAPPING), stat = sTAT, position = POSITION) + COORDINATE_FUNCTION + FACET_FUNCTION + SCALE_FUNCTION + THEME_FUNCTION
+
+**Use data frame as input for a graphic and specify the set of plot aesthetics intended to be common throughout all subsequent layers unless specifically overridden.** *ggplot(data = mpg, aes(x = city, y = hwy)) Begins a plot that you finis by adding layers to.*
+    
+**Example**
+
+I have used the ggplot() function below to visualize the count of majors in each major category. I have added different layers such as title, labels, and name for each axis among others:
+
+```{r}
+ggplot(all_count, aes(x=reorder(Major_category, -n), n)) + geom_bar(stat="identity", width = 0.5, fill = "tomato2") + labs(x = "Major Category", y = "Count", title = "Count of Major Categories") + theme(axis.text.x = element_text(angle = 60, hjust = 1, size=8)) + geom_label(aes(label=all_count$n), position = position_dodge(width = 0.1), size = 3, label.padding = unit(0.1, "lines"), label.size = 0.09, inherit.aes = TRUE)
+```
+
