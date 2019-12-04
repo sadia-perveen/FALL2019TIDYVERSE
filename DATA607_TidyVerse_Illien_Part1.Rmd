@@ -1,0 +1,146 @@
+---
+title: "DATA607_TidyVerse_Illien_Part1"
+author: "Mael Illien"
+date: "11/26/2019"
+output:
+  html_document: 
+    toc: yes
+    toc_collapsed: yes
+    toc_float: yes
+  md_document:
+      variant: markdown_github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Tidyverse stringr vignette
+
+## stringr
+
+The `stringr` package is an integral part of the Tidyverse and it is the package of choice for working with character strings.
+
+We will be using the pipe notation `%>%` throughout this vignette.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+We start by loading into R data from Kaggle containing information about breweries in the United States found [here](https://www.kaggle.com/brkurzawa/us-breweries/data).
+
+```{r}
+url <- 'https://raw.githubusercontent.com/maelillien/tidyverse/master/breweries_us.csv'
+breweries <- read.csv(url)
+head(breweries)
+```
+
+# Detecting Matches
+
+Here we look into some of the functions we can use to detect pattern matches in a string. 
+
+## str_detect
+
+The `str_detect` function takes in a column character vector and a pattern, and returns a boolean vector indicating which strings contain the pattern, in this case `PO`. We can use this functionality to identify which addresses are PO boxes.
+
+```{r}
+t0 <- breweries$address %>% str_detect("PO")
+head(t0)
+```
+
+```{r}
+head(breweries[t0,])
+```
+
+## str_which
+
+The `str_which` function behaves similarly but instead it returns the indexes of the rows in the data frame where PO is found in the `address` column. 
+
+```{r}
+t1 <- breweries$address %>% str_which("PO")
+head(t1)
+```
+
+We obtain the same result as above.
+
+```{r}
+head(breweries[t1,])
+```
+
+# Mutating Strings
+
+Here we look at some of the functions that can be used to modify or mutate strings.
+
+## str_replace
+
+The `str_replace` function can be used to replace a pattern matched in a string by another string. In the example below, we look for brewery addresses containing `Inc.` or all its variants in order to standardize the nomenclature. We reuse the `str_which` function to identify the rows containing the pattern of interest. 
+
+```{r}
+inc <- breweries$brewery_name %>% str_which("INC.|inc.|Inc.|INC|inc|Inc")
+head(inc)
+```
+
+We can see below that Inc has been correct to Inc. in the first two rows. The remaining rows were formatted correctly to begin with. 
+
+```{r}
+t1 <- breweries %>% select(brewery_name) %>% slice(inc)
+head(t1)
+```
+
+```{r}
+breweries$brewery_name <- breweries$brewery_name %>% str_replace("INC.|inc.|Inc.|INC|inc|Inc", "Inc.")
+t2 <- breweries %>% select(brewery_name) %>% slice(inc)
+head(t2)
+```
+
+## str_to_upper
+
+There are three functions we can use to modify the case of a string: `str_to_upper`, `str_to_lower` and `str_to_tile`. The below is an example of the first function. 
+
+```{r}
+t4 <- sapply(breweries$address, function(x) str_to_upper(x))
+head(t4)
+```
+
+# Subseting Strings
+
+Here we look at some functionaliy for subsetting strings.
+
+## str_extract and str_extract_all
+
+The `str_extract` function takes a character string column and a patern, and returns the first occurence of the matched pattern. The more general function `str_extract_all` returns all matches of the pattern. We use it below to extract the zip codes from the address column. We should be mindful that building numbers corresponding to the pattern will also be matched.
+
+```{r}
+t5 <- breweries$address %>% str_extract_all("([:digit:]{5})$")
+head(t5)
+```
+
+# Join and Split
+
+Here we look some functionaliy for joining and splititng strings.
+
+## str_split
+
+The `str_split` takes in a column vector and a separator character or pattern. We use it below to separate the `brewery_address` column by `,` into its individual components for further processing.
+
+```{r}
+t6 <- breweries$address %>% str_split(",")
+head(t6)
+```
+
+## str_c
+
+The `str_c` will do just the opposite of the `sr_split` function and will instead concatenate individual strings into a single string.
+
+```{r}
+t7 <- sapply(t6, function(x) str_c(x, collapse = ","))
+head(t7)
+```
+
+We should note that `stringr` is a package for manipulating strings. Some of the examples above like splitting the address column into its constituent parts would be better served by the use of the `str_separate` function from the `dplyr` package.
+
+For more information, check out the `stringr` cheatsheet on [github](https://github.com/rstudio/cheatsheets/blob/master/strings.pdf).
+
+
+
+
