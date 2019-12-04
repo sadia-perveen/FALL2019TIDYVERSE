@@ -218,3 +218,13 @@ Part1: Use filter(), arrange(), select(), rename（）,mutate（）and summaries
 Part2: Extend Lin Li's example, use select(), filter(), and summaries to show the filtered dataset.
 
        
+## Kaggle TidyVerse Vignette
+Author: Sin Ying Wong
+
+* Part 1: The dataset I used is "Border Crossing Entry Data" (https://www.kaggle.com/akhilv11/border-crossing-entry-data/data). To reduce size of the data, I selected the data from year 2002 to 2019. 
+  * You can find this here: 
+    RPubs: [http://rpubs.com/shirleywong/data607TidyVerse1]
+    GitHub: [https://github.com/shirley-wong/Data-607/blob/master/Border_Crossing_Entry_Data_2002-2019.csv]
+
+* Part 2: I extended the RamenRatings vignette by Sie Siong Wong to include additional aggregations and ggplot.
+  * You can find this here: [http://rpubs.com/shirleywong/data607TidyVerse2]
