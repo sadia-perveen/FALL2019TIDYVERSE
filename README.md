@@ -228,3 +228,15 @@ Author: Sin Ying Wong
 
 * Part 2: I extended the RamenRatings vignette by Sie Siong Wong to include additional aggregations and ggplot.
   * You can find this here: [http://rpubs.com/shirleywong/data607TidyVerse2]
+  
+# Suicides data Tidyverse vignette
+
+Author: Farhana Zahir 
+
+Part 01: Description: Filtered out the 2014 data and answered the following questions
+1.	What are the 10 countries with highest rates of male suicides?
+2.	What are the 10 countries with highest rates of female suicides?
+3.	Distribution of suicide rates globally (limited to data available in the database) Dataset: https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016. Tools used : Filter, which(is.na), mutate, gather, group_by, summarize, top_n, arrange, ggplot Rpubs: https://rpubs.com/zahirf/555529
+
+Part 02: Extended Bryan Persaud’s work on Avengers dataset, added visualizations to show No of appearance by selected avengers Calculated male vs female avengers percentages Rpubs: http://rpubs.com/zahirf/556314
+
