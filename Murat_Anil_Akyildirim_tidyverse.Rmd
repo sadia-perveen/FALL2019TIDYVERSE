@@ -1,0 +1,174 @@
+---
+title: "Document Classification"
+author: Anil Akyildirim
+date: "10/19/2019"
+output:
+  html_document:
+    code_download: yes
+    code_folding: hide
+    highlight: pygments
+    number_sections: yes
+    theme: flatly
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+
+# Introduction
+
+In this assignment, we are looking at tidyverse which has collection of R packages that can help us loading the dataset to R, cleaning, transforming and visuzalizing of the data.The goal of this assignment is to create a sample dataset that shows the capabilities of tidyverse with and example dataset. The example dataset I selected is "Wine Data" from Kaggle. Since, we are selecting an example dataset, we might as well select an example business obsective. The business problem in question that I choose to answer at the end of this analysis is "What are the top ranked wines from US?" Can we determine what type of wine we can select based on their origin?". 
+
+# About the Data Set
+
+The data set we chose for this assignment is wine reviews. The variable descriptions are outlined below
+
+* Country: The country that the wine is from.
+
+* Description: The description of the variable.
+
+* Designation: The vineyard within the winery where the grapes that made the wine are from.
+
+* Points: The number of points Wine Enthusiast rated the wine on a scale of 1-100 (though they say they only post reviews for wines that score >=80)
+
+* Price: The cost for a bottle of the wine
+
+* Province: The province or state that the wine is from
+
+* Region 1: The wine growing area in a province or state (ie Napa)
+
+* Region 2: Sometimes there are more specific regions specified within a wine growing area (ie Rutherford inside the Napa Valley), but this value can sometimes be blank
+
+# Loading Tidyverse
+
+```{r}
+installed.packages("tidyverse")
+library(tidyverse)
+```
+
+When we install and load the tidyverse, we see that we loaded below packages
+
+* ggplot2
+
+* tibble
+
+* tidyr
+
+* readr
+
+* purr
+
+* dplyr 
+
+* stringr
+
+* forcats 
+
+# Data Collection
+
+We can use read_csv function from readr package within tidyverse to read the data from csv.
+
+```{r}
+
+wine <- read_csv("https://raw.githubusercontent.com/anilak1978/tidyverse/master/winemag-data_first150k.csv")
+
+head(wine)
+
+```
+
+We can use as_tibble function from tibble package within tidyverse. This will change the class of the wine dataframe to tibble. With data frame being tibble we can further leverage dplyr package within tidyverse. 
+
+```{r}
+
+wine <- as_tibble(wine)
+head(wine)
+
+```
+
+# Data Cleaning and Transformation
+
+When we look at the dataset, we see there are many columns that may not be neccesary for our analysis. For example our business objective is to only look at the wines that are from US. In this case we can group based on selected columns using select function in dplyr package. We can further filter the dataset for the wines that are from US by using filter() function. We can also arrange the dataset to display points by decreasing order by using arrange function. Since we are using multiple functions to the data, we might as well use pipe for code efficiency. 
+
+```{r}
+#filter, select the needed columns and arrange 
+wine_df <- wine %>%
+  filter(country=="US") %>%
+  select(country, province, region_1, variety, points, price) %>%
+  arrange(desc(points))
+
+head(wine_df)
+
+```
+
+Since we are looking for the top ranked wines based on their origin, we can group them based on their variety. We can use group_by function in dplyr package. 
+
+```{r}
+
+wine_group<- wine_df %>%
+  group_by(variety)
+
+wine_group
+
+
+```
+
+We can look at an overview of our latest dataset by using glimpse function.
+
+```{r}
+
+glimpse(wine_group)
+
+```
+
+We have 62,397 observations, grouped by variety of 218 wines. 
+
+We should look for missing values and handle them as needed.
+
+```{r}
+
+sum(is.na(wine_group))
+sum(is.na(wine_group$country))
+sum(is.na(wine_group$province))
+sum(is.na(wine_group$region_1))
+sum(is.na(wine_group$variety))
+sum(is.na(wine_group$points))
+sum(is.na(wine_group$price))
+
+```
+
+
+We have total of 394 missing values. 136 missing values in region_1 column and 258 missing values in price column. COnsidering we have 62,397 observations, we can remove the 394 missing values from our dataset. We can use drop_na function from dplyr function to do this. 
+
+```{r}
+
+wine_final <- wine_group %>%
+  drop_na()
+
+wine_final
+
+
+```
+
+We have loaded and cleaned our data by using tibble, dplyr packages from tidyverse. Our data set is ready for analysis.
+
+# Data Exploration and Visualization
+
+We can use ggplot package from tidyverser to visualize the top ranking wine in the US. 
+
+```{r}
+
+theme_set(theme_bw())
+ggplot(wine_final, aes(province, points))+
+  geom_bar(stat="identity", width=5, fill="tomato3")+
+  theme(axis.text.x=element_text(angle=65, vjust=0.6))
+
+```
+
+# Conclusion
+
+In this assignment, we were able to read the data, clean and transform and visualize by using tidyverse packages, dplyr, tibble and ggplot. Based on our analysis, we were able to find the origin of the top ranking wine within US. We can extend this analysis further and look to see if there are correlations between variables such as points vs price. We can also explore ways to create a simple or multiple linear predictive model.  
+
+
+
+

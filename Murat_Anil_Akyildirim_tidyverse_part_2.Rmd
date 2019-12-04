@@ -1,0 +1,81 @@
+---
+title: "Murat_Anil_Akyildirim_Tidyverse_Part_2"
+author: "Anil Akyildirim"
+date: "12/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## This is an update to Abdelmalek Hajjam
+
+Load Tidyverse with all its packages instead of individual packages
+
+
+```{r}
+library(tidyverse)
+
+```
+
+
+```{r}
+DataSet <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/ncaa-womens-basketball-tournament/ncaa-womens-basketball-tournament-history.csv", sep = ",", stringsAsFactors = F)
+
+
+```
+
+Use tibble similar to dataframe
+
+```{r}
+
+DataSet <- as.tibble(DataSet)
+
+```
+
+
+```{r}
+# Rename columns
+names(DataSet) <- c("Year", "School", "Seed", "Conference", "ConfW", "ConfL","Conf", "ConfPlace", "RegW", "RegL", "Reg", "HowQual", "X1stGameAtHome", "TourneyW", "TourneyL", "TourneyFinish", "FullW", "FullL", "Full")
+
+```
+
+
+```{r}
+head(DataSet)
+```
+
+
+Use groupby 
+
+```{r}
+
+DataSet_conference <-DataSet %>%
+  group_by(Conference)
+
+DataSet
+
+
+```
+
+Use arrange 
+
+```{r}
+
+DataSet_RegW <- DataSet %>%
+  arrange(desc(RegW))
+
+DataSet_RegW
+
+```
+
+Use glimpse
+
+```{r}
+
+glimpse(DataSet)
+
+
+```
+
