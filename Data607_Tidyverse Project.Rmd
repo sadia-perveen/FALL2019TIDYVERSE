@@ -1,0 +1,148 @@
+---
+title: "Data607_Tidyverse Project"
+author: "Emmanuel Hayble-Gomes"
+date: "12/03/2019"
+output: html_document
+---
+
+### Tidyverse Assignment
+
+Task
+
+Create an Example. Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle,
+create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the
+selected TidyVerse package with your selected dataset. (25 points)
+
+Extend an Existing Example. Using one of your classmate’s examples (as created above), extend his or her example with additional annotated code. (15 points)
+
+
+The dataset:
+The data source for this project is from Kaggle using the link below:
+https://www.kaggle.com/theworldbank/sustainable-development-goals
+
+
+I'm familiar with this dataset, I intend to analyze and perform data mungling, data transformation and visualization with the Tidyverse package.
+
+
+The data consist of the following scenrios:
+
+SSP1 = low challenges for both climate change adaptation and mitigation resulting from income growth which
+does not rely heavily on natural resources and technological change, coupled with low fertility rate and high educational attainment.
+
+SSP2 = benchmark scenario and assumes the continuation of current global socioeconomic trends at the global level.
+
+SSP3 = low economic growth coupled with low educational attainment levels and high population growth at the global level are the main elements of the narrative,which is characterized by high mitigation and adaptation challenges.
+
+SSP4 = narrative of worldwide polarization, with high income countries exhibiting relatively high growth rates of income, while developing economies present low levels of education, high fertility and economic stagnation.
+
+SSP5 = high economic growth coupled with high demand for fossil energy from developing economies, thus increasing global Carbon dioxide emissions.
+
+Load the Tidyverse Package
+
+```{r}
+library(tidyverse)
+```
+
+Importing the data from my GitHub
+```{r}
+SDG <- read.csv("https://raw.githubusercontent.com/Emahayz/Data-607-Class/master/data_poverty_gdppc.csv", header = T, sep = ",")
+```
+
+Lets view the new structure
+```{r}
+str(SDG)
+head(SDG)
+```
+
+Some Visualization- Scatter Plot
+```{r}
+ggplot(SDG, aes(x=gdp.capita, y=extreme.Poor,shape=ssp, color=ssp)) +geom_point()+
+      labs(
+        title="Global Poverty Projection",
+         x="Gross Domestic Product", y = "Extreme Poverty"
+      )
+```
+
+The scatter plot shows that as National GDP decreases, Extreme Poverty Increases with more indication of scenario SSP3 to SSP5.
+
+This data seems to be presented in long format,I will Transform the data to wide format
+```{r}
+SDGWide <- SDG %>% spread(ssp, extreme.Poor)
+```
+
+Cleaning the data by removing the missing values
+```{r}
+SDGWide_New <- na.omit(SDGWide)
+```
+
+View the data again
+```{r}
+head(SDGWide_New)
+```
+
+The Average GDP per Capita is less than $20 Million ($19,106M)
+```{r}
+summary(SDGWide_New$gdp.capita)
+```
+
+Histogram showing GDP per Capita
+
+```{r}
+hist(SDGWide_New$gdp.capita)
+```
+ 
+Question: What percentage of these projections were made using Regression Model?
+
+```{r}
+table(SDGWide_New$hc.source)
+round(prop.table(table(SDGWide_New$hc.source)) *100,digit = 1)
+```
+About 12% of the Extreme Poverty Projections were made using Regression model while 88% of the projections were survey based.
+
+Show on a Map the Annual GDP per Capita of Nigeria (NGA) and Uganda (UGA)
+First I will need to subset this data and create a dataframe for the Nigeria and Uganda
+```{r}
+SDGdata1 <- subset(SDGWide_New, SDGWide_New$ccode == "NGA" | SDGWide_New$ccode == "UGA")
+SDGdata1
+```
+
+Some Visualization- Box Plot of Annual GDP of Nigeria and Uganda
+```{r}
+ggplot(SDGdata1, aes(x=ccode, y=gdp.capita, color=ccode)) +
+  geom_bar(stat="identity", fill="white")+facet_wrap(~year)+
+  labs(
+    title="Annual GDP of Nigeria and Uganda",
+    x="Country Code", y = "GDP per Capita"
+  )
+```
+
+### Conclusion
+The largest differences in poverty headcount and poverty rates across scenarios appear for Sub-Sahara Africa, where the projections for the most optimistic scenario imply over 300 million individuals living in extreme poverty in 2030. The analysis indicate that about 647 million people live in extreme poverty. This implies that the big bulk of the poverty reduction challenge is expected to be in Africa, which is expected to make progress slowly. 
+
+### Extending Amber Ferger's Example
+
+```{r}
+dat <- as_tibble(read.csv('https://raw.githubusercontent.com/amberferger/DATA607_Masculinity/master/raw-responses.csv'))
+```
+
+```{r}
+str(dat)
+head(dat)
+```
+
+This data has several mising values, I will use the tidyr function from Tidyverse Package to exclude missing values
+```{r}
+dat %>% drop_na()
+```
+
+Some Visualization with ggplot
+
+```{r}
+ggplot(dat, aes(x=weight)) +
+    geom_histogram(aes(y = ..density..), binwidth=density(dat$weight)$age) +
+    geom_density(fill="red", alpha = 0.2) +
+  labs(title= "Histogram for Weight", x = "Weight", y = "Frequency")
+```
+
+
+
