@@ -229,7 +229,7 @@ Author: Sin Ying Wong
 * Part 2: I extended the RamenRatings vignette by Sie Siong Wong to include additional aggregations and ggplot.
   * You can find this here: [http://rpubs.com/shirleywong/data607TidyVerse2]
   
-  Suicides data Tidyverse Vignette
+# Suicides data Tidyverse vignette
 
 Author: Farhana Zahir 
 
