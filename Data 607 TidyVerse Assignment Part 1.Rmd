@@ -36,3 +36,25 @@ Avengers_2012
 ```
 
 For my Tidyverse example I used the Avengers dataset from FiveThirtyEight. The dataset contains a list of members of the Avengers group from the Marvel comics. The list shows appearances of when they were first introduced in the comics and if/when they died and/or returned. I used the filter function from the dplyr package to extract every avenger from the 2012 Avengers film. I then put them into a list and used the full_join function from the dplyr function to put every avenger that I got from using the filter function into one data frame.
+
+# Some Visualizations: Edited by Farhana Zahir
+
+No of appearances by the Avengers
+
+```{r}
+ggplot(Avengers_2012, aes(x=Name.Alias, y=as.numeric(Appearances)))+
+  geom_bar(stat='identity')+
+  ggtitle("Number of appearances by selected Avengers")+
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+# Male vs Female Avengers Percentage
+
+```{r}
+gender<-Avengers%>%
+  select(Gender, Appearances)%>%
+  group_by(Gender)%>%
+  summarise(total=sum(Appearances))%>%
+  mutate(Percentage=total/sum(total))
+gender
+```
