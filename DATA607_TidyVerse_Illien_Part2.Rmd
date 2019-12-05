@@ -3,12 +3,12 @@ title: "DATA607_TidyVerse_Illien_Part2"
 author: "Mael Illien"
 date: "12/03/2019"
 output:
+  md_document:
+      variant: markdown_github
   html_document: 
     toc: yes
     toc_collapsed: yes
     toc_float: yes
-  md_document:
-      variant: markdown_github
 ---
 
 ## Extending the example below
