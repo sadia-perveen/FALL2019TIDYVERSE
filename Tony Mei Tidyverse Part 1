@@ -1,0 +1,78 @@
+---
+title: "Data 607 tidyverse Project"
+author: "Tony Mei"
+date: "12/1/2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cerulean
+---
+# Introduction
+
+I am observing the annual returns of the FANG stocks from 2013 to 2016. FANG stocks are the technology companies, Facebook, Amazon, Netflix and Google. I will like to study the perfomance of each stock in each year by only looking at the return rates. The data will be acquired from Yahoo Finance.  
+
+# Loading MyPackage
+
+```{r}
+library(tidyverse)
+library(tidyquant)
+library(MyPackage)# this is the package created, contains the function to obtain annual rates for stock over a ten year period.
+```
+
+# Cleaning up the data
+
+```{r}
+data("FANG")
+FANG_returns_yearly <- FANG %>%
+    group_by(symbol) %>%
+    tq_transmute(select     = adjusted, 
+                 mutate_fun = periodReturn, 
+                 period     = "yearly", 
+                 col_rename = "yearly.returns") 
+```
+
+
+# Graph Analysis
+
+```{r}
+FANG_returns_yearly %>%
+    ggplot(aes(x = year(date), y = yearly.returns, fill = symbol)) +
+    geom_bar(position = "dodge", stat = "identity") +
+    labs(title = "FANG: Annual Returns", 
+         y = "Returns", x = "Year", color = "") +
+    scale_y_continuous(labels = scales::percent) +
+    theme_tq() +
+    scale_fill_tq()
+```
+
+I can tell that in the year 2013, Netflix had a 300% annual return rate. So for investors that bought in and cashed out that year, they found a handsome return. The year 2016 had the lowest return rates for all the 4 companies. 
+
+# Annual returns of APPL
+
+Using the the get_annual_returns function I will obtain the annual returns of the company Apple, INC. The ticker symbol is APPL.
+
+```{r}
+APPL<-get_annual_returns("AAPL")
+APPL %>% 
+  ggplot(aes(x=date, y= yearly.returns))+
+  geom_bar(fill='lightblue', stat="identity")+
+  labs(title = "APPL", y = "Year", x = "Year")
+  
+```
+
+# Annual returns of Tesla
+
+```{r}
+TESLA<-get_annual_returns("TSLA")
+TESLA %>% 
+  ggplot(aes(x=date, y= yearly.returns))+
+  geom_bar(fill='lightpink', stat="identity")+
+  labs(title = "Tesla", y = "Year", x = "Year")
+```
+
+# Analysis
+
+I analzyed the annual returns of two companies from different sectors, Apple inc. and Tesla over a ten year period starting from 2008-01-01 to 2018-12-31. Tesla is from Consumer Cyclical sector while Apple is from the technology sector. Year 2009 provided the highest annual return for Apple with 0.904. 
+Year 2013 provided the highest annual return for Tesla with 1.49. Apple also have more years with negative annual returns compared to Tesla. Apple have 3 years of negative returns to Tesla's one.
+
