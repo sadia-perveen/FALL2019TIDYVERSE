@@ -1,0 +1,84 @@
+
+ mkolp0-" 
+date: "11/30/2019"
+output: html_document
+---
+
+```{r}
+library(knitr)
+library(tidyverse)
+```
+
+# Read Data using readr
+
+We use a fixed commit because this version has a data issue. 
+
+```{r}
+df <- read_csv("https://raw.githubusercontent.com/willoutcault/Data607-Data-Acquisition/975ba8d48e0c3d8590bd9afa79e75632152aabfc/runningbacks%20consolidated.csv")
+```
+
+# Select Factors of Interest
+```{r}
+df2 <- select(df, "DisplayName", "PlayerHeight","PossessionTeam", "PlayerWeight")
+```
+
+# Seperate Feet and Inches in Height Column
+The height column has actually been misparsed as a date (e.g. 02-Jun for 6 feet 2 inches). we can use Lubridate to parse this out and recover, but we have to be a bit clever because the misparsing reads as Jun-00 for someone 6 feet exactly. So we replace the 00 with 13 using stringr and then take the month compoennt as feet, and the inches component we check if the day is 13 and take that as 0 otherwise we use days directly.  
+```{r}
+df2$playerHeightDate <- lubridate::parse_date_time(str_replace(df2$PlayerHeight,"00","13"), c("d-b","b-d"))
+df3 <- df2
+df3$feet <- lubridate::month(df2$playerHeightDate)
+df3$inches <- ifelse(lubridate::day(df2$playerHeightDate)==13,0,lubridate::day(df2$playerHeightDate)) 
+```
+
+# Create Column with Total Inches
+```{r}
+df4 <- df3 %>% mutate(Height = (feet*12) + inches) %>%
+  select("DisplayName", "Height", "PlayerWeight", "PossessionTeam")
+```
+
+# Use BMI Forumla to Calculate Player's BMI
+```{r}
+df5 <- df4 %>%
+  mutate(bmi = 703*PlayerWeight/(Height^2))
+kable(head(df5))
+```
+
+
+```{r}
+df5 %>% ggplot(aes(bmi)) + geom_histogram()
+```
+
+# Extended part by Tony Mei
+
+1) Convert the height of each players from inches into centimeters(metric system)
+
+```{r}
+height_in_cm <- df5 %>% mutate(Height_in_inches = Height * 2.54)
+height_in_cm
+```
+
+2) Find out which team have the tallest players on average
+
+```{r}
+tallest_players<-height_in_cm %>% 
+  group_by(PossessionTeam) %>% 
+  summarise(Total=mean(Height_in_inches)) %>% 
+  arrange(desc(Total))
+tallest_players
+```
+
+Based of the analysis above, Pittsburgh Steelers on average have the tallest players out of the 6 teams.
+
+3) Find out which team have the heaviest players on average.
+
+```{r}
+heaviest_players<-height_in_cm %>% 
+  group_by(PossessionTeam) %>% 
+  summarise(Total=mean(PlayerWeight)) %>% 
+  arrange(desc(Total))
+heaviest_players
+```
+
+
+Based of the analysis above, Pittsburgh Steelers on average have the heaviest players out of the 6 teams. Basic observations tell us that Pittsburgh Steelers have the tallest and heaviest players out of the 6 teams. 
