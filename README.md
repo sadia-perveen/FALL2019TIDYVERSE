@@ -240,3 +240,15 @@ Part 01: Description: Filtered out the 2014 data and answered the following ques
 
 Part 02: Extended Bryan Persaud’s work on Avengers dataset, added visualizations to show No of appearance by selected avengers Calculated male vs female avengers percentages Rpubs: http://rpubs.com/zahirf/556314
 
+
+### stringr vignette
+
+Author: Mael Illien
+
+Part 1: Examples of functionality from the stringr package
+
+cf. `DATA607_TidyVerse_Illien_Part1.Rmd`
+
+Part 2: Added dplyr separate to C. Rosemond's submission.
+
+cf. `DATA607_TidyVerse_Illien_Part2.Rmd`
