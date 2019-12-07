@@ -1,0 +1,64 @@
+---
+title: "TidyVerseAssignment_Part1"
+author: "Lin Li"
+date: "12/1/2019"
+output: html_document
+---
+
+## Task 1:
+Create a programming sample “vignette” that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset.
+
+# My chosen dataset:
+From fivethirtyeight: "Some people are too superstitious to have a baby on Friday the 13th"
+
+Loading and exploring datasets:
+
+```{r}
+birth_NCHS <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/births/US_births_1994-2003_CDC_NCHS.csv")
+birth_SSA <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/births/US_births_2000-2014_SSA.csv")
+head(birth_NCHS)
+```
+
+
+# I would like to compare mean births on Fridays to other days to see if there is a difference in the dataset for 1994-2003.
+
+```{r}
+library(dplyr)
+
+# getting mean births for each day of the week for both datasets:
+
+NCHS_mean <- 
+    birth_NCHS %>%
+        group_by(day_of_week) %>% 
+        summarise(mean_birthNCHS = mean(births))
+NCHS_mean
+
+SSA_mean <-
+    birth_SSA %>% 
+        group_by(day_of_week) %>% 
+        summarise(mean_birthSSA = mean(births))
+SSA_mean   
+```
+
+```{r}
+library(ggplot2)
+chart_birth_NCHS <- ggplot(data = NCHS_mean, aes(x=day_of_week, y=mean_birth)) +
+    geom_bar(stat = "identity", width = 0.6, fill = "black")
+chart_birth_NCHS
+
+chart_birth_CDC <- ggplot(data = CDC_mean, aes(x=day_of_week, y= mean_birthCDC)) +
+    geom_bar(stat = "identity", width = 0.6, fill = "red")
+chart_birth_CDC
+```
+
+
+# Compare mean birth on Fridays between the two datasets, which represent two separate decades, 1994-2003 and 2000-2014.
+```{r}
+# join the two datasets:
+library(dplyr)
+joint_births <- left_join(NCHS_mean, SSA_mean, by = "day_of_week")
+joint_births
+
+```
+
+The two datasets have similar births throughout the week. Surprisingly, Sunday has the lowest mean births for both datasets.
