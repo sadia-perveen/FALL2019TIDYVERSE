@@ -47,8 +47,19 @@ raceCount
 
 ```
 
-We'll do the same thing for the **orientation** variable. 
+We can take these numbers and run them through the **summarise** function to get useful data points for later evaluation. 
 
+* Note - adding () around your entire code section will have R display the results.  This is useful if you are working with small dataframes.   
+
+```{r}
+(raceSum<-
+raceCount %>%
+  group_by(race2)%>%
+    summarise(median = median(RACE_PCT), mean = mean(RACE_PCT), sd = sd(RACE_PCT)))
+```
+  
+We'll do the same thing for the **orientation** variable. 
+  
 ``` {r}
 
 orientationCount <- dat %>% 
@@ -61,6 +72,20 @@ orientationCount <- orientationCount %>%
 
 orientationCount
 
+```
+  
+Performing the same summarise function for the **orientation** variable.
+  
+```{r}
+(orientationSum<-
+orientationCount %>%
+  group_by(orientation)%>%
+    summarise(median = median(ORIENTATION_PCT), mean = mean(ORIENTATION_PCT), sd = sd(ORIENTATION_PCT)))
+
+(q0002orientationsum <-
+  orientationCount %>%
+    group_by(q0002)%>%
+      summarise(median = median(ORIENTATION_PCT), mean = mean(ORIENTATION_PCT), sd = sd(ORIENTATION_PCT)))
 ```
 
 
@@ -85,3 +110,24 @@ ggplot(orientationCount, aes(fill=orientation, y=ORIENTATION_PCT, x=q0002)) +
     ggtitle("Orientation vs Answer")
 
 ```
+
+```{r}
+library(RColorBrewer)
+
+ggplot(orientationCount, aes(x=orientation, y=ORIENTATION_PCT, color=orientation)) +
+    geom_boxplot()+
+    ggtitle(label = "Orientation percentage")+
+  scale_fill_brewer(palette="Set3")
+ 
+ggplot(orientationCount, aes(x=q0002, y=ORIENTATION_PCT, color=orientation)) +
+    geom_boxplot()+
+    ggtitle(label = "Question 2 by orientation")+
+  scale_fill_brewer(palette="Set3")
+ 
+```
+additional sections added by John Kellogg include lines:
+
+* 49-59
+* 66-73
+* 114-127
+
