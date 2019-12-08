@@ -1,0 +1,119 @@
+---
+title: "Tidyverse - Zhi Ying Chen"
+output: 
+  html_document:
+    df_print: paged
+  md_document:
+    variant: markdown_github
+---
+#Part I
+#Using one or more TidyVerse packages, and any dataset from fivethirtyeight.com or Kaggle, create a programming sample "vignette" that demonstrates how to use one or more of the capabilities of the selected TidyVerse package with your selected dataset. (25 points)
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+#Load the data from Kaggle
+```{r}
+avocado_price <- read.csv("https://raw.githubusercontent.com/Zchen116/tidyverse/master/avocado.csv")
+head(avocado_price)
+summary(avocado_price)
+```
+#Use filter function to filter Boston's avocado price from the dataset
+```{r}
+head(filter(avocado_price,region== "Boston"))
+```
+#Use arrange function to arrange the Average Price from the highest
+```{r}
+head(avocado_price%>%arrange(desc(AveragePrice)))
+```
+#Use arrange function to arrange the Average Price from the lowest
+```{r}
+head(avocado_price%>%arrange(AveragePrice))
+```
+#Use select function to choose data of region, year, type, and Average Price to create another data frame
+```{r}
+head(avocado_price%>%select(region, year,type,AveragePrice))
+```
+#Use rename function to rename column
+```{r}
+head(rename(avocado_price, city = region))
+```
+#Use summarise function to a data frame  about minium, mean, and maxium of Average Price
+```{r}
+filter(avocado_price,region == "Boston")%>%summarise(AveragePrice_min=min(AveragePrice), AveragePrice_mean=mean(AveragePrice),AveragePrice_max=max(AveragePrice))
+```
+#Use group_by function
+```{r}
+by_region <- group_by(avocado_price, region)
+sui <- summarise(by_region,
+  count = n(),
+  AveragePrice_mean = mean(AveragePrice, na.rm = TRUE))
+head(sui %>% arrange(desc(AveragePrice_mean)))
+```
+#Use mutate function
+```{r}
+my_data<-head(sui %>% arrange(desc(AveragePrice_mean)) %>%  mutate(AveragePrice_mean = round(AveragePrice_mean, 2)),20)
+my_data
+```
+#Use ggplot2 function to create graph
+```{r}
+my_data%>%ggplot(aes(x=region, y=AveragePrice_mean, fill=region))+
+  geom_bar(stat = "identity", position = "dodge") + 
+  guides(fill = FALSE) +
+  ggtitle("Average Price mean") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+### Lin Li's extension to Part 1
+```{r}
+by_year <- group_by(avocado_price, year)
+sui2 <- summarise(by_year, AvgPrice_mean = mean(AveragePrice, na.rm = TRUE))
+head(sui2 %>% arrange(year))
+
+```
+
+```{r}
+PriceByYear <- ggplot(data = sui2, aes(x=year, y=AvgPrice_mean, fill=year))+
+  geom_bar(stat = "identity", position = "dodge") +
+  ggtitle("Mean Price by Year") 
+  
+PriceByYear
+
+```
+
+
+#Part 2
+#Extend an Existing Example.  Using one of your classmate's examples (as created above), extend his or her example with additional annotated code. (15 points)
+#1, Get dataset from 538 (existing code)
+```{r}
+weather <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/us-weather-history/KCLT.csv")
+summary(weather)
+```
+#2, Tidyr separate function (existing code):
+```{r}
+library(tidyr)
+weather2 <- weather %>% separate(date, c("year", "month", "day"), sep = "-")
+summary(weather2)
+```
+#3, Dplyr select function (existing code):
+```{r}
+head(select(weather2, year, actual_mean_temp, record_min_temp, record_max_temp, record_precipitation))
+```
+#4, Dplyr filter (subsetting dataset) (existing code):
+```{r}
+head(filter(weather2, year == "2014"))
+```
+#Extend Part:
+#Use select and filter funtion 
+```{r}
+weather3 <- weather2 %>%select(year, actual_mean_temp, actual_min_temp, actual_max_temp, actual_precipitation)
+head(filter(weather3, year == "2014"))
+```
+#Use summarise function to a data frame  about minium, mean, and maxium
+```{r}
+filter(weather3, year == "2014")%>%summarise(min=min(actual_min_temp), mean=mean(actual_mean_temp),max=max(actual_max_temp))
+```
+
+
+
