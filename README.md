@@ -252,3 +252,13 @@ cf. `DATA607_TidyVerse_Illien_Part1.Rmd`
 Part 2: Added dplyr separate to C. Rosemond's submission.
 
 cf. `DATA607_TidyVerse_Illien_Part2.Rmd`
+
+### dplyr_filter_select vignette
+
+Author: John Kellogg
+
+Part 1: Breaking down the operations in the Dplyr Filter and select operations
+file: dplyr_filter_select_kellogg.Rmd
+
+Part 2: Extended Amber Ferger's Tidyverse Assignment - Masculinity Data to include the summarize function and added to the Visualization section 
+file: Masculinity_Data.Rmd
