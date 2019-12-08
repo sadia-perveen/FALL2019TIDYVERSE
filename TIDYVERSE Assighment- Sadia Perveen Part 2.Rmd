@@ -1,0 +1,104 @@
+---
+title: "TIDYVERSE Part 2"
+author: "Sadia Perveen"
+date: "12/8/2019"
+output: html_document
+---
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library('knitr')
+```
+
+## Data Source
+
+https://www.kaggle.com/ronitf/heart-disease-uci
+
+## Load Data
+
+```{r Load Data}
+heart <- read_csv("https://raw.githubusercontent.com/forhadakbar/data607fall2019/master/Week%2014/heart.csv")
+kable (head(heart))
+```
+
+## Capability 1.
+
+`slice` capability tutorial
+
+Description: Using slice we can select rows by specifying the row number.  
+Usage: slice(data, …)  
+Example: To select rows 6 to 12
+
+
+```{r}
+slice(heart, 6:12)
+```
+
+OR
+
+To select rows 10 to 15, 18 and 299 to 302
+
+```{r}
+heart %>% slice(c(10:15, 18, 299:302))
+```
+
+## Capability 2.
+
+`mutate` capability tutorial
+
+Description: Creates new columns based on existing ones  
+Usage: mutate(.data, …)  
+Example: Let’s look at a ratio of resting blood pressure to cholesterol under a new column name “Ratio”
+
+```{r}
+#Ratio = trestbps/chol
+heart %>% select(trestbps, chol) %>% mutate(Ratio = trestbps/chol)
+```
+
+## Capability 3.
+
+`summarise` capability tutorial
+
+Description: Applies functions that return results of length 1. Can perform multiple calculations in the same call.  
+Usage: summarise(data, …)  
+Example: Lets see mean and median cholesterol along with mean and median maximum heart rate achieved.
+
+```{r}
+heart %>% summarise(Avg_cholesteral = mean(chol), Median_cholesteral = median(chol), Avg_heartrate = mean(thalach), Median_heartrate = median(thalach))
+```
+
+## Capability 4.
+
+`group_by` capability tutorial with tally
+
+Description: Using group_by and tally we can find count of category member  
+Usage: group_by(data, …)  
+Example: Find the count by sex
+
+```{r}
+heart %>% group_by(sex) %>% tally()
+```
+## Capability 5.
+
+`rename` capability
+
+Description: Using rename function without changing the content of the data frame  
+Rename column sex to M_F
+Note this only affects the new dataframe - heart_new
+```{r}
+heart_new <- dplyr::rename(heart, M_F = sex)
+names(heart_new)
+```
+
+Adding to Project 
+
+
+1) Arraging the data by oldpeak
+```{r}
+arg_oldpeak <- dplyr::arrange(heart, oldpeak)
+arg_oldpeak
+```
+Here we are comparing oldpeak and age 
+```{r}
+ggplot(heart, aes(x=oldpeak, y=age)) + geom_point()
+```
+
